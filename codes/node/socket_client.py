@@ -1,0 +1,106 @@
+# coding: utf-8
+
+import sys
+import socket
+import select
+import time
+from config import *
+from commander import *
+from data_transceiver import *
+    
+
+class Socket_client(Commander):
+    # Object control
+    def __init__(self, server_ip, server_port):
+        super().__init__()
+        self.server_address = socket.getaddrinfo(server_ip, server_port)[-1][-1]
+        self._stop = False
+ 
+    def __del__(self):
+        self.parent = None
+        del self.parent
+        
+ 
+    def set_parent(self, parent = None):        
+        self.parent = parent
+
+                  
+    def run(self):        
+        self.connect()        
+ 
+ 
+    def stop(self):
+        self._stop = True
+        self.__del__()
+        
+
+    def stopped(self):
+        return self._stop
+        
+        
+    
+    # Socket operations
+    def connect(self):        
+        while True: 
+            if self.stopped(): break 
+                
+            try:
+                self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                self.data_transceiver = Data_transceiver()
+                self.message = None
+                self.socket.connect(self.server_address)
+                self.on_connected()  
+                
+            except Exception as e:
+                print(e)
+                time.sleep(CLIENT_RETRY_TO_CONNECT_AFTER_SECONDS)
+            
+    
+    def on_connected(self):
+        print('[connected: {0}]'.format(self.server_address))
+        self.receive()
+
+
+    def on_closed(self):
+        print('closed: ', self.server_address)
+        del self.socket
+            
+
+    def receive(self):
+        print('listen_to_command')
+        self.socket.settimeout(CLIENT_RECEIVE_TIME_OUT_SECONDS)
+        
+        while True:
+            data = None
+            
+            try: 
+                data = self.socket.recv(BUFFER_SIZE)
+                
+                # connection closed
+                if not data: 
+                    self.on_closed()
+                    break
+                
+                # receive data
+                self.on_receive(data)
+                
+            except Exception as e:
+                
+                # Connection reset.
+                if IS_MICROPYTHON:
+                    if str(e) == MICROPYTHON_SOCKET_CONNECTION_RESET_ERROR_MESSAGE:
+                        raise e
+                elif isinstance(e, ConnectionResetError):
+                    raise e
+                    
+                # Receiving process timeout.
+                self.process_messages()
+ 
+
+    def on_receive(self, data):
+        if data:
+            # data received
+            data, message_string = self.data_transceiver.unpack(data)
+            self.message = self.decode_message(message_string)
+            ordered_message = self.get_OrderedDict(self.message) 
+            print('\nData received: {0} bytes\nMessage:\n{1}\n'.format(len(data), ordered_message))

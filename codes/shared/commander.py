@@ -1,0 +1,190 @@
+# coding: utf-8
+
+import json
+import config
+
+if config.IS_MICROPYTHON:
+    from ucollections import OrderedDict
+else:
+    from collections import OrderedDict
+       
+       
+class Commander():
+
+    def __init__(self):
+        # self.message_queue = 
+        self.set_default_code_book()
+        self.switch = {}
+        self.switch['file'] = self.do_file
+        self.switch['script'] = self.do_script
+        self.switch['command'] = self.do_command
+        self.switch['function'] = self.do_function
+        self.switch['exec'] = self.do_exec
+        self.switch['eval'] = self.do_eval
+        self.switch['compile'] = self.do_compile
+
+
+    def set_code_book(self, code_book = {}):        
+        self.code_book = code_book
+       
+       
+    def set_default_code_book(self):
+        self.code_book = {}
+
+        
+    # https://docs.python.org/3.5/library/json.html
+    def encode_message(self, **kwargs):
+        try:
+            return json.dumps(self.format_message(**kwargs))
+        except Exception as e:
+            print(e)       
+        
+        
+    def format_message(self, 
+                       sender, receiver, type,
+                       message_id = None, 
+                       info = None,
+                       time_stamp = None,
+                       file = None,
+                       script = None,
+                       to_compile = None,
+                       to_exec = None,
+                       to_evaluate = None,
+                       command = None,
+                       function = None, kwargs = None,
+                       need_result = False, result = None,
+                       reply_to = None, correlation_id = None):
+        
+        message = {}        
+        if sender: message['sender'] = sender
+        if receiver: message['receiver'] = receiver
+        if type: message['type'] = type
+        if message_id: message['message_id'] = message_id
+        if info: message['info'] = info
+        if time_stamp: message['time_stamp'] = time_stamp
+        if file: message['file'] = file
+        if script: message['script'] = script
+        if to_compile: message['to_compile'] = to_compile
+        if to_exec: message['to_exec'] = to_exec
+        if to_evaluate: message['to_evaluate'] = to_evaluate
+        if command: message['command'] = command
+        if function: message['function'] = function
+        if kwargs: message['kwargs'] = kwargs
+        if need_result: message['need_result'] = need_result
+        if result: message['result'] = result
+        if reply_to: message['reply_to'] = reply_to        
+        if correlation_id: message['correlation_id'] = correlation_id
+            
+        # message = {'sender': sender,
+                   # 'receiver': receiver,
+                   # 'type': type,
+                   # 'message_id': message_id,                    
+                   # 'info': info,                   
+                   # 'time_stamp': time_stamp,  
+                   # 'script': script,                   
+                   # 'to_compile': to_compile,
+                   # 'to_exec': to_exec,
+                   # 'to_evaluate': to_evaluate,
+                   # 'command': command,
+                   # 'function': function, 'kwargs': kwargs,
+                   # 'need_result': need_result, 'result': result,
+                   # 'reply_to': reply_to, 'correlation_id': correlation_id}
+                           
+        return message
+
+        
+    def get_OrderedDict(self, dictionary):
+        return OrderedDict(sorted(dictionary.items())) 
+
+    def get_JSONized_dict(self, dictionary):
+        return json.dumps(dictionary, sort_keys = True, indent = 4) 
+                       
+            
+    def decode_message(self, message_string):
+        if message_string:
+            try:
+                return json.loads(message_string)
+            except Exception as e:
+                print(e)
+                
+        
+    def do(self, message):
+        if message: return self.switch[message.get('type')](message) 
+
+        
+    def do_file(self, message):
+        if message.get('file'):
+            with open('uploaded_file.py', 'w') as f:
+                f.write(message.get('file'))
+                
+        return None, None 
+        
+        
+    def do_script(self, message):
+        if message.get('script'):
+            with open('script.py', 'w') as f:
+                f.write(message.get('script'))
+            import script
+            script.main()
+        return None, None  
+        
+
+    def do_compile(self, message):
+        if message.get('to_compile'):
+            task = compile
+            return self.do_task(task, message)   
+                
+        return None, None   
+        
+        
+    def do_exec(self, message):
+        if message.get('to_exec'):
+            exec(message.get('to_exec'))
+            return None, None   
+                
+        return None, None   
+
+        
+    def do_eval(self, message):
+        if message.get('to_evaluate'):
+            result = eval(message.get('to_evaluate'))
+            return self.process_result(message, result)   
+                
+        return None, None 
+        
+        
+    def do_function(self, message):
+        if message.get('function'):
+            task = getattr(self, message.get('function'))
+            return self.do_task(task, message)
+            
+        return None, None             
+        
+
+    def do_command(self, message):
+        if message.get('command'):
+            task = self.code_book.get(message.get('command'))            
+            return self.do_task(task, message)    
+            
+        return None, None 
+        
+        
+    def do_task(self, task, message):
+        if task:
+            try:
+                kwargs = message.get('kwargs')
+                result = task(**kwargs) if kwargs else task()
+                return self.process_result(message, result)
+            except Exception as e:
+                print(e)   
+                
+        return None, None         
+ 
+
+    def process_result(self, message, result):
+        if message.get('need_result'):
+            message['type'] = 'result'
+            message['result'] = result
+            return message, self.encode_message(**message)
+        
+        return None, None 
