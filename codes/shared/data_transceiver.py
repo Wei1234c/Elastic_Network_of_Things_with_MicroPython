@@ -1,6 +1,6 @@
 # coding: utf-8
 
-from config import *
+import config
 
        
 class Data_transceiver():
@@ -9,9 +9,9 @@ class Data_transceiver():
         self.data = b''
         self.buffer = b''
         self.message = b''
-        self.header = PACKAGE_START
+        self.header = config.PACKAGE_START
         self.header_length = len(self.header)
-        self.tail = PACKAGE_END
+        self.tail = config.PACKAGE_END
         self.tail_length = len(self.tail)
 
     

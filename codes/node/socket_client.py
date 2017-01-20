@@ -1,19 +1,18 @@
 # coding: utf-8
 
-import sys
-import socket
-import select
 import time
-from config import *
-from commander import *
-from data_transceiver import *
+import socket
+import commander
+import config
+import data_transceiver
     
 
-class Socket_client(Commander):
+class Socket_client(commander.Commander):
     # Object control
     def __init__(self, server_ip, server_port):
         super().__init__()
         self.server_address = socket.getaddrinfo(server_ip, server_port)[-1][-1]
+        self.data_transceiver_ready = False
         self._stop = False
  
     def __del__(self):
@@ -45,15 +44,17 @@ class Socket_client(Commander):
             if self.stopped(): break 
                 
             try:
+                self.data_transceiver_ready = False
                 self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                self.data_transceiver = Data_transceiver()
+                self.data_transceiver = data_transceiver.Data_transceiver()
+                self.data_transceiver_ready = True
                 self.message = None
                 self.socket.connect(self.server_address)
                 self.on_connected()  
                 
             except Exception as e:
                 print(e)
-                time.sleep(CLIENT_RETRY_TO_CONNECT_AFTER_SECONDS)
+                time.sleep(config.CLIENT_RETRY_TO_CONNECT_AFTER_SECONDS)
             
     
     def on_connected(self):
@@ -68,13 +69,13 @@ class Socket_client(Commander):
 
     def receive(self):
         print('listen_to_command')
-        self.socket.settimeout(CLIENT_RECEIVE_TIME_OUT_SECONDS)
+        self.socket.settimeout(config.CLIENT_RECEIVE_TIME_OUT_SECONDS)
         
         while True:
             data = None
             
             try: 
-                data = self.socket.recv(BUFFER_SIZE)
+                data = self.socket.recv(config.BUFFER_SIZE)
                 
                 # connection closed
                 if not data: 
@@ -87,8 +88,8 @@ class Socket_client(Commander):
             except Exception as e:
                 
                 # Connection reset.
-                if IS_MICROPYTHON:
-                    if str(e) == MICROPYTHON_SOCKET_CONNECTION_RESET_ERROR_MESSAGE:
+                if config.IS_MICROPYTHON:
+                    if str(e) == config.MICROPYTHON_SOCKET_CONNECTION_RESET_ERROR_MESSAGE:
                         raise e
                 elif isinstance(e, ConnectionResetError):
                     raise e
@@ -102,5 +103,5 @@ class Socket_client(Commander):
             # data received
             data, message_string = self.data_transceiver.unpack(data)
             self.message = self.decode_message(message_string)
-            ordered_message = self.get_OrderedDict(self.message) 
-            print('\nData received: {0} bytes\nMessage:\n{1}\n'.format(len(data), ordered_message))
+            print('\nData received: {0} bytes\nMessage:\n{1}\n'.format(len(data), self.get_OrderedDict(self.message)))
+            

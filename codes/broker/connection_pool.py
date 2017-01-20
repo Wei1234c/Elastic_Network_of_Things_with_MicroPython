@@ -1,7 +1,8 @@
 # coding: utf-8
 
+
 import json
-from data_transceiver import *
+import data_transceiver
 
 
 class Connection_pool():
@@ -16,7 +17,7 @@ class Connection_pool():
         connection = {'address': address, 'name': str(address), 'socket': socket}  
         self.connections[str(address)] = connection       
         self.regenerate_connections_by_name()
-        self.data_transceivers[socket] = Data_transceiver()
+        self.data_transceivers[socket] = data_transceiver.Data_transceiver()
         return connection
         
         

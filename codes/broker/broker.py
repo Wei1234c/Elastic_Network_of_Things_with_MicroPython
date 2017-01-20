@@ -5,15 +5,17 @@ import sys
 
 sys.path.append(os.path.abspath(os.path.join(os.path.pardir, 'shared')))
 
-from config import *
-from hub import *
+import config
+import hub
 
 
 class Broker():
 
     def __init__(self):
         super().__init__()
-        self.hub = Hub(BIND_IP, HUB_PORT, MAX_CONCURRENT_CONNECTIONS)
+        self.hub = hub.Hub(config.BIND_IP, 
+                       config.HUB_PORT, 
+                       config.MAX_CONCURRENT_CONNECTIONS)
         self.hub.daemon = True
         
             

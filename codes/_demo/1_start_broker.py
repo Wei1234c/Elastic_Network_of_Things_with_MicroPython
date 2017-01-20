@@ -6,12 +6,12 @@ import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.pardir, 'broker')))
 sys.path.append(os.path.abspath(os.path.join(os.path.pardir, 'shared')))
 
-from broker import *
+import broker 
  
 
 def main():    
     try:
-        the_broker = Broker()
+        the_broker = broker.Broker()
         the_broker.run()        
         the_broker.hub.join()
         

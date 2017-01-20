@@ -4,21 +4,24 @@ from abc import ABCMeta, abstractmethod
 import socket
 import select
 import threading
-import time
 import datetime
-from config import *
-from connection_pool import *
-from commander import *
+import time
+import config 
+import connection_pool
+import commander
 
 
-class Socket_server(threading.Thread, Connection_pool, Commander, metaclass = ABCMeta):
+class Socket_server(threading.Thread,
+                    connection_pool.Connection_pool,
+                    commander.Commander, 
+                    metaclass = ABCMeta):
 
     # Object control
     def __init__(self, bind_ip, bind_port, max_concurrent_connections = 200):        
         super().__init__()
-        self.name = SERVER_NAME
-        Connection_pool.__init__(self)
-        Commander.__init__(self)
+        self.name = config.SERVER_NAME
+        connection_pool.Connection_pool.__init__(self)
+        commander.Commander.__init__(self)
         self._stop = threading.Event()
         self._stop.clear()
         
@@ -67,7 +70,7 @@ class Socket_server(threading.Thread, Connection_pool, Commander, metaclass = AB
             sockets.append(self.socket)
             
             # select
-            list_to_read, _, _ = select.select(sockets, [], [], SERVER_POLLING_REQUEST_TIMEOUT_SECONDS)
+            list_to_read, _, _ = select.select(sockets, [], [], config.SERVER_POLLING_REQUEST_TIMEOUT_SECONDS)
             
             # process tasks
             for self.socket_being_read in list_to_read:
@@ -81,7 +84,7 @@ class Socket_server(threading.Thread, Connection_pool, Commander, metaclass = AB
                 else:
                     # try to receive data 
                     try: 
-                        data = self.socket_being_read.recv(BUFFER_SIZE)
+                        data = self.socket_being_read.recv(config.BUFFER_SIZE)
                         if len(data) == 0:
                             # self.on_close()
                             ## connections list has changed
@@ -142,4 +145,4 @@ class Socket_server(threading.Thread, Connection_pool, Commander, metaclass = AB
                 message_bytes = self.data_transceivers[socket].pack(message_string)
                 socket.sendall(message_bytes)
             
-            time.sleep(HEART_BEAT_PROBING_PER_SECONDS)
+            time.sleep(config.HEART_BEAT_PROBING_PER_SECONDS)

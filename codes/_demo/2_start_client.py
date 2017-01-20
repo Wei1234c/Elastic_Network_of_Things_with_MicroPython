@@ -8,7 +8,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.pardir, 'node')))
 sys.path.append(os.path.abspath(os.path.join(os.path.pardir, 'shared')))
 sys.path.append(os.path.abspath(os.path.join(os.path.pardir, 'micropython')))
  
-from client import *
+import client
 from collections import OrderedDict
  
 
@@ -16,7 +16,7 @@ def main():
     
     try:
         # start and wait until client thread is ready
-        the_client = Client()
+        the_client = client.Client()
         the_client.daemon = True
         the_client.start()
         the_client.ready.wait() 
@@ -63,7 +63,6 @@ def main():
         # time.sleep(10)
         
         # stop()
-        # the_client.stop()
         the_client.join()
         print ('Demo stopped _______________________________')
         
@@ -74,6 +73,3 @@ def main():
         
 if __name__ == '__main__':
     main()
-        
-
-

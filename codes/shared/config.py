@@ -2,6 +2,17 @@
 
 import sys
 
+# 'esp8266' or 'win32'
+SYS_PLATFORM = sys.platform
+
+# 'micropython' or 'cpython'
+SYS_IMPLEMENTATION = sys.implementation.name
+IS_MICROPYTHON = SYS_IMPLEMENTATION == 'micropython'
+ 
+
+# import data_transceiver
+
+
 
 ## Must config ******************
 
@@ -13,28 +24,20 @@ HUB_PORT = 9662
 
 
 
-
-# 'esp8266' or 'win32'
-SYS_PLATFORM = sys.platform
-
-# 'micropython' or 'cpython'
-SYS_IMPLEMENTATION = sys.implementation.name
-IS_MICROPYTHON = SYS_IMPLEMENTATION == 'micropython'
-
 DEBUG_MODE = True
 
 
-# print if in debug mode
-def dprint(*args, **kwargs):
-    if DEBUG_MODE:
-        print(*args, **kwargs)
+# # print if in debug mode
+# def dprint(*args, **kwargs):
+    # if DEBUG_MODE:
+        # print(*args, **kwargs)
    
    
-# a mock object to turn keyword dict into attributes        
-class Mock():
-    def __init__(self, key_words_dict):
-        if key_words_dict:
-            for key, value in key_words_dict.items(): setattr(self, key, value)
+# # a mock object to turn keyword dict into attributes        
+# class Mock():
+    # def __init__(self, key_words_dict):
+        # if key_words_dict:
+            # for key, value in key_words_dict.items(): setattr(self, key, value)
         
 
 # Usually no need to config these.

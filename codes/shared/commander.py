@@ -3,6 +3,7 @@
 import json
 import config
 
+
 if config.IS_MICROPYTHON:
     from ucollections import OrderedDict
 else:

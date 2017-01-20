@@ -1,10 +1,9 @@
 # coding: utf-8
 
-import time
-from config import *
+import config
 
 
-if IS_MICROPYTHON: 
+if config.IS_MICROPYTHON: 
     import machine
     id = str(machine.unique_id())
     id = id.replace('\\', '_')

@@ -1,33 +1,19 @@
 # coding: utf-8
 
-import os
-import sys   
-import time
+
 import gc
-from config import *
-from socket_client import Socket_client 
-from node_config import *
+import config
+import socket_client
+import worker_config
 
 
-if IS_MICROPYTHON:
-    from hardware import *
-    from led import *
-    from u_python import *
-    from watchdog import *    
-    now = time.ticks_ms
-    import machine
-else:    
-    import datetime
-    now = datetime.datetime.now
-
-
-class Worker(Socket_client): 
+class Worker(socket_client.Socket_client): 
         
     # Object control
     def __init__(self, server_address, server_port):
         super().__init__(server_address, server_port)
-        self.name = WORKER_NAME
-        print('My name is ', self.name)
+        self.name = worker_config.WORKER_NAME
+        print('My name is', self.name)
         self.message_queue_in = []
         self.message_queue_out = []
         # self.message_queue_result = []
@@ -37,24 +23,29 @@ class Worker(Socket_client):
     def on_connected(self):
         # set my name
         message = self.format_message(sender = self.name,
-                                      receiver = SERVER_NAME,                                       
+                                      receiver = config.SERVER_NAME,                                       
                                       info = '*** Hello! My name is {0} ***'.format(self.name),
                                       type = 'command', 
                                       command = 'set connection name',
                                       kwargs = {'name': self.name}, 
-                                      need_result = True)                                      
+                                      need_result = True)
+                                      
+        print('[connected: {0}]'.format(self.server_address))
         self.send_message(message)
-        super().on_connected()
+        self.receive()
 
 
-    def on_receive(self, data):
-        super().on_receive(data)      
+    def on_receive(self, data):        
+        super().on_receive(data)        
         self.message_queue_in.append(self.message)        
         self.process_messages()
                 
 
     def process_messages(self):
-        time_stamp = str(now())
+        # print('[GC recycled: {}]'.format(gc.collect()))
+        if config.IS_MICROPYTHON: print('[Memory - free: {} allocated: {}]'.format(gc.mem_free(), gc.mem_alloc()))
+        gc.collect()
+        time_stamp = str(self.now())
         
         # outgoing messages requested by client
         if len(self.message_queue_out) > 0:
@@ -83,7 +74,7 @@ class Worker(Socket_client):
                                                             correlation_id = message.get('correlation_id'))
                         
                         print('\nProcessed result:\n{0}\n'.format(self.get_OrderedDict(reply_message)))
-                        # return result
+                        
                         if message.get('need_result'):                    
                             self.send_message(reply_message)
                     
@@ -92,14 +83,14 @@ class Worker(Socket_client):
 
         
     def request(self, message):
-        time_stamp = str(now())
+        time_stamp = str(self.now())
         message['message_id'] = time_stamp
         message['sender'] = self.name
         message['reply_to'] = self.name          
         message['result'] = None
         message['correlation_id'] = time_stamp
-        self.message_queue_out.append(self.format_message(**message))
-        # self.process_messages()
+        self.message_queue_out.append(self.format_message(**message))        
+        if self.data_transceiver_ready: self.process_messages()
         
 
     def send_message(self, message):
@@ -107,4 +98,3 @@ class Worker(Socket_client):
         message_bytes = self.data_transceiver.pack(message_string)
         print('Sending {0} bytes\nMessage:\n{1}\n'.format(len(message_bytes), self.get_OrderedDict(message)))
         self.socket.sendall(message_bytes)
-        print('GC recycled: ', gc.collect())

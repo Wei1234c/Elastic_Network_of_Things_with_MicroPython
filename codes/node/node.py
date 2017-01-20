@@ -3,26 +3,24 @@
 import os
 import sys
 
-IS_MICROPYTHON = sys.implementation.name == 'micropython'
-
-if not IS_MICROPYTHON:
+if not sys.implementation.name == 'micropython':
     sys.path.append(os.path.abspath(os.path.join(os.path.pardir, 'shared')))
         
-from config import *
+import config
+import commander
 
-if IS_MICROPYTHON:
-    from worker_upython import *
+
+if config.IS_MICROPYTHON:
+    import worker_upython as worker_impl
 else:
-    from worker_upython import *
-    
-from commander import *
+    import worker_cpython as worker_impl   
     
 
-class Node(Commander):
+class Node(commander.Commander):
 
     def __init__(self):
         super().__init__()
-        self.worker = Worker(BROKER_HOST, HUB_PORT)
+        self.worker = worker_impl.Worker(config.BROKER_HOST, config.HUB_PORT)
         self.worker.set_parent(self)
         
         

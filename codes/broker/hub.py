@@ -1,13 +1,12 @@
 # coding: utf-8
 
-from socket_server import Socket_server
-import time
+import config
+import socket_server
 import datetime
 now = datetime.datetime.now
-from config import *
 
 
-class Hub(Socket_server): 
+class Hub(socket_server.Socket_server): 
         
     # code book_______________________
     def set_default_code_book(self):
@@ -22,7 +21,7 @@ class Hub(Socket_server):
             time_stamp = str(datetime.datetime.now())
             message['time_stamp'] = time_stamp
             
-            if message.get('receiver') == SERVER_NAME:    # message is dedicated to Hub
+            if message.get('receiver') == config.SERVER_NAME:    # message is dedicated to Hub
                 if message.get('type') == 'result': # result replied to Hub
                     pass
                 
@@ -33,12 +32,12 @@ class Hub(Socket_server):
                     
                     try:
                         reply_message = self.format_message(message_id = time_stamp,
-                                                            sender = SERVER_NAME,
+                                                            sender = config.SERVER_NAME,
                                                             receiver = message.get('sender'),
                                                             time_stamp = time_stamp,
                                                             type = 'result',
                                                             need_result = False, result = message.get('result'),
-                                                            reply_to = SERVER_NAME,
+                                                            reply_to = config.SERVER_NAME,
                                                             correlation_id = message.get('correlation_id'))
                                                 
                         print('\nProcessed result:\n{0}\n'.format(self.get_JSONized_dict(reply_message)))

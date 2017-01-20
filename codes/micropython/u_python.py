@@ -2,11 +2,9 @@
 
 import os
 import machine
-from hardware import *
-from led import *
-from watchdog import *   
-
-
+import hardware
+import led
+    
 
 def get_output_pin(id, mode = machine.Pin.OUT, pull = None):
     return machine.Pin(id, mode, pull)
@@ -24,7 +22,7 @@ def del_all_files():
 
         
 def read_GPIOs_pins():
-    status = sorted([(id, get_input_pin(id).value()) for id in list(gpio_pins[5:])])    
+    status = sorted([(id, get_input_pin(id).value()) for id in list(hardware.gpio_pins[5:])])    
     print("GPIO pins status: \n{0}".format(status))
     return status
 
