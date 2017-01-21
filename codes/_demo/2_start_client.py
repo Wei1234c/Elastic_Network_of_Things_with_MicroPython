@@ -59,9 +59,7 @@ def main():
         for remote_node in remote_nodes:
             for message in messages.values():
                 the_client.request(remote_node, message)
-        
-        # time.sleep(10)
-        
+                
         # stop()
         the_client.join()
         print ('Demo stopped _______________________________')
