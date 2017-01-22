@@ -18,7 +18,11 @@ def main():
     try:
         # start and wait until client thread is ready
         the_client = client.Client()
-        the_client.start() 
+        the_client.start()
+        
+        while not the_client.status['Is connected']:            
+            time.sleep(1)
+            print('Node not ready yet.')
         
         
         # nodes ************** need to modify accordingly.
@@ -54,21 +58,24 @@ def main():
         # messages['test upload script'] = {'type': 'script', 
                                           # 'script': script}                                        
         
+        
+        print ('\n[______________ Sending messages ______________]\n')
         # send out the messages
         for remote_node in remote_nodes:
             for message in messages.values():
                 the_client.request(remote_node, message)
                 
         # stop()
-        print ('\n[_________ Wait 5 seconds for reply. _________]\n')
-        time.sleep(5)
+        print ('\n[_________ Wait few seconds for reply _________]\n')
+        time.sleep(7)
+        
         the_client.stop()
-        print ('\n[_________________ Demo stopped ______________]\n')
+        print ('\n[________________ Demo stopped ________________]\n')
         
     except KeyboardInterrupt:
         print("Ctrl C - Stopping.")
         the_client.stop()
-        sys.exit(1)            
+        sys.exit(1) 
                 
         
 if __name__ == '__main__':

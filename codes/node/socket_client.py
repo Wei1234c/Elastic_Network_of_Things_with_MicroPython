@@ -12,10 +12,11 @@ class Socket_client(commander.Commander):
     def __init__(self, server_ip, server_port):
         super().__init__()
         self.socket = None
+        self.data_transceiver = None
         self.server_address = socket.getaddrinfo(server_ip, server_port)[-1][-1]
-        self.data_transceiver_ready = False
-        self.is_connected = False
-        self._stop = False
+        self.status = {'Datatransceiver ready': False, 
+                       'Is connected': False,
+                       'Stop': False}
  
     def __del__(self):
         self.parent = None
@@ -30,11 +31,11 @@ class Socket_client(commander.Commander):
  
  
     def stop(self):
-        self._stop = True
+        self.status['Stop'] = True
         
 
     def stopped(self):
-        return self._stop
+        return self.status['Stop']
         
         
     
@@ -44,12 +45,12 @@ class Socket_client(commander.Commander):
             if self.stopped(): break             
                 
             try:
-                self.data_transceiver_ready = False
-                self.is_connected = False
+                self.status['Datatransceiver ready'] = False
                 self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 self.data_transceiver = data_transceiver.Data_transceiver()
-                self.data_transceiver_ready = True
+                self.status['Datatransceiver ready'] = True
                 self.message = None
+                self.status['Is connected'] = False
                 self.socket.connect(self.server_address)
                 self.on_connected()  
                 
@@ -59,8 +60,8 @@ class Socket_client(commander.Commander):
             
     
     def on_connected(self):
-        print('[connected: {0}]'.format(self.server_address))
-        self.is_connected = True        
+        print('\n[connected: {0}]'.format(self.server_address))
+        self.status['Is connected'] = True
         self.receive()
 
 
@@ -70,7 +71,7 @@ class Socket_client(commander.Commander):
             
 
     def receive(self):
-        print('listen_to_command')
+        print('[Listen to messages]')
         self.socket.settimeout(config.CLIENT_RECEIVE_TIME_OUT_SECONDS)
         
         while True:

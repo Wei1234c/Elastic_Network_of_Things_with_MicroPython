@@ -15,7 +15,8 @@ class Client(threading.Thread):
     
     def __init__(self):        
         super().__init__(name = 'Client', daemon = True)
-        self.node = node.Node() 
+        self.node = node.Node()
+        self.status = self.node.worker.status
         
         
     def _request(self, node, receiver, message):
@@ -24,7 +25,10 @@ class Client(threading.Thread):
         
         
     def request(self, receiver, message):
-        self._request(self.node, receiver, message)  
+        try:
+            self._request(self.node, receiver, message)  
+        except Exception as e:
+            print(e)
         
         
     def run(self):
