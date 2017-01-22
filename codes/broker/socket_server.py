@@ -65,6 +65,7 @@ class Socket_server(threading.Thread,
         
         while True:
             if self.stopped(): break
+                
             # generate list of sockets
             sockets = list(self.get_sockets_list())
             sockets.append(self.socket)
@@ -130,7 +131,7 @@ class Socket_server(threading.Thread,
                 
         
     def probe_connections(self):
-        while True: 
+        while True:
             if self.stopped(): break                
             print('Heart-beat probing at: {}'.format(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')))            
             

@@ -12,11 +12,11 @@ import broker
 def main():    
     try:
         the_broker = broker.Broker()
-        the_broker.run()        
-        the_broker.hub.join()
+        the_broker.run()
         
     except KeyboardInterrupt:
         print("Ctrl C - Stopping.")
+        the_broker.stop()
         sys.exit(1)  
         
 if __name__ == '__main__':

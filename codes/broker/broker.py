@@ -14,13 +14,17 @@ class Broker():
     def __init__(self):
         super().__init__()
         self.hub = hub.Hub(config.BIND_IP, 
-                       config.HUB_PORT, 
-                       config.MAX_CONCURRENT_CONNECTIONS)
+                           config.HUB_PORT, 
+                           config.MAX_CONCURRENT_CONNECTIONS)
         self.hub.daemon = True
         
             
     def run(self):
         self.hub.start()
+        
+
+    def stop(self):
+        self.hub.stop()
  
  
         
@@ -28,11 +32,11 @@ def main():
     try:            
         broker = Broker()
         broker.run()
-        broker.hub.join()
         print('Broker stopped. _____________________________')        
         
     except KeyboardInterrupt:
         print("Ctrl C - Stopping server")
+        broker.stop()
         sys.exit(1)
         
 

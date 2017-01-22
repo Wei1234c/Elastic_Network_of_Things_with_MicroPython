@@ -14,13 +14,8 @@ import node
 class Client(threading.Thread):
     
     def __init__(self):        
-        super().__init__(name = 'Client')
-        self.node = None
-        self.ready = threading.Event()
-        
-        
-    def __del__(self):
-        self.stop()  
+        super().__init__(name = 'Client', daemon = True)
+        self.node = node.Node() 
         
         
     def _request(self, node, receiver, message):
@@ -33,8 +28,6 @@ class Client(threading.Thread):
         
         
     def run(self):
-        self.node = node.Node()
-        self.ready.set()
         self.node.run()
        
        

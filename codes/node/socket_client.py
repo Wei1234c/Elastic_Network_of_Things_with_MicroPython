@@ -11,13 +11,14 @@ class Socket_client(commander.Commander):
     # Object control
     def __init__(self, server_ip, server_port):
         super().__init__()
+        self.socket = None
         self.server_address = socket.getaddrinfo(server_ip, server_port)[-1][-1]
         self.data_transceiver_ready = False
+        self.is_connected = False
         self._stop = False
  
     def __del__(self):
         self.parent = None
-        del self.parent
         
  
     def set_parent(self, parent = None):        
@@ -30,7 +31,6 @@ class Socket_client(commander.Commander):
  
     def stop(self):
         self._stop = True
-        self.__del__()
         
 
     def stopped(self):
@@ -41,10 +41,11 @@ class Socket_client(commander.Commander):
     # Socket operations
     def connect(self):        
         while True: 
-            if self.stopped(): break 
+            if self.stopped(): break             
                 
             try:
                 self.data_transceiver_ready = False
+                self.is_connected = False
                 self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 self.data_transceiver = data_transceiver.Data_transceiver()
                 self.data_transceiver_ready = True
@@ -59,6 +60,7 @@ class Socket_client(commander.Commander):
     
     def on_connected(self):
         print('[connected: {0}]'.format(self.server_address))
+        self.is_connected = True        
         self.receive()
 
 
@@ -72,6 +74,8 @@ class Socket_client(commander.Commander):
         self.socket.settimeout(config.CLIENT_RECEIVE_TIME_OUT_SECONDS)
         
         while True:
+            if self.stopped(): break 
+                
             data = None
             
             try: 

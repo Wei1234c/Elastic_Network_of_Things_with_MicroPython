@@ -23,15 +23,6 @@ class Node(commander.Commander):
         self.worker = worker_impl.Worker(config.BROKER_HOST, config.HUB_PORT)
         self.worker.set_parent(self)
         
-        
-    def __del__(self):
-        self.stop()
-        
-        
-    def set_default_code_book(self):
-        code_book = {}
-        self.set_code_book(code_book) 
-        
             
     def run(self): 
         self.worker.run()
@@ -40,7 +31,6 @@ class Node(commander.Commander):
     def stop(self): 
         self.worker.stop()
         self.worker.set_parent(None)
-        del self.worker
         
         
     def request(self, **message):
@@ -55,6 +45,7 @@ def main():
         
     except KeyboardInterrupt:
         print("Ctrl C - Stopping.")
+        node.stop()
         sys.exit(1)            
                 
         

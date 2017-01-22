@@ -2,6 +2,7 @@
 
 import os
 import sys
+import time
  
 sys.path.append(os.path.abspath(os.path.join(os.path.pardir, 'client')))
 sys.path.append(os.path.abspath(os.path.join(os.path.pardir, 'node')))
@@ -17,15 +18,13 @@ def main():
     try:
         # start and wait until client thread is ready
         the_client = client.Client()
-        the_client.daemon = True
-        the_client.start()
-        the_client.ready.wait() 
+        the_client.start() 
         
         
         # nodes ************** need to modify accordingly.
         # check out Broker's console for the list of nodes.
         remote_nodes = ['NodeMCU_1dsc000', 'NodeMCU_f1d30800']                     
-        # remote_nodes = ['NodeMCU_1dsc000']                     
+        # remote_nodes = ['NodeMCU_f1d30800']                     
         
         
         # messages
@@ -61,11 +60,14 @@ def main():
                 the_client.request(remote_node, message)
                 
         # stop()
-        the_client.join()
-        print ('Demo stopped _______________________________')
+        print ('\n[_________ Wait 5 seconds for reply. _________]\n')
+        time.sleep(5)
+        the_client.stop()
+        print ('\n[_________________ Demo stopped ______________]\n')
         
     except KeyboardInterrupt:
         print("Ctrl C - Stopping.")
+        the_client.stop()
         sys.exit(1)            
                 
         

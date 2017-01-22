@@ -30,7 +30,8 @@ class Worker(socket_client.Socket_client):
                                       kwargs = {'name': self.name}, 
                                       need_result = True)
                                       
-        print('[connected: {0}]'.format(self.server_address))
+        print('[connected: {0}]'.format(self.server_address))        
+        self.is_connected = True 
         self.send_message(message)
         self.receive()
 
@@ -94,7 +95,10 @@ class Worker(socket_client.Socket_client):
         
 
     def send_message(self, message):
-        message_string = self.encode_message(**message)
-        message_bytes = self.data_transceiver.pack(message_string)
-        print('Sending {0} bytes\nMessage:\n{1}\n'.format(len(message_bytes), self.get_OrderedDict(message)))
-        self.socket.sendall(message_bytes)
+        if self.is_connected:
+            message_string = self.encode_message(**message)
+            message_bytes = self.data_transceiver.pack(message_string)
+            print('Sending {0} bytes\nMessage:\n{1}\n'.format(len(message_bytes), self.get_OrderedDict(message)))
+            self.socket.sendall(message_bytes)
+        else:
+            print('Not connected yet.')
