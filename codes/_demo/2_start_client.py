@@ -24,7 +24,7 @@ def main():
         
         # nodes ************** need to modify accordingly.
         # check out Broker's console for the list of nodes.
-        remote_nodes = ['NodeMCU_f1d30800', 'NodeMCU_1dsc000']                     
+        remote_nodes = ['NodeMCU_1dsc000', 'NodeMCU_f1d30800']                     
         # remote_nodes = ['NodeMCU_1dsc000']                     
         
         

@@ -8,7 +8,6 @@ import threading
 sys.path.append(os.path.abspath(os.path.join(os.path.pardir, 'shared')))
 sys.path.append(os.path.abspath(os.path.join(os.path.pardir, 'node')))
 
-from config import *
 import node
 
 
