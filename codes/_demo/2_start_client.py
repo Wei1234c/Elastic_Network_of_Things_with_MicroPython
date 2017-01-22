@@ -27,8 +27,9 @@ def main():
         
         # nodes ************** need to modify accordingly.
         # check out Broker's console for the list of nodes.
-        remote_nodes = ['NodeMCU_1dsc000', 'NodeMCU_f1d30800']                     
-        # remote_nodes = ['NodeMCU_f1d30800']                     
+        remote_nodes = [{'name': 'Living room main light', 'type': 'D1 mini', 'id': 'NodeMCU_1dsc000'},
+                        {'name': 'Coffee maker', 'type': 'NodeMCU v2', 'id': 'NodeMCU_f1d30800'},
+                        {'name': 'Front gate', 'type': 'NodeMCU v2', 'id': 'NodeMCU_d1e0a200'},]                   
         
         
         # messages
@@ -63,7 +64,7 @@ def main():
         # send out the messages
         for remote_node in remote_nodes:
             for message in messages.values():
-                the_client.request(remote_node, message)
+                the_client.request(remote_node['id'], message)
                 
         # stop()
         print ('\n[_________ Wait few seconds for reply _________]\n')

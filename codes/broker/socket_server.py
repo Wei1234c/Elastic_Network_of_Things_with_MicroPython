@@ -85,25 +85,17 @@ class Socket_server(threading.Thread,
                 else:
                     # try to receive data 
                     try: 
-                        data = self.socket_being_read.recv(config.BUFFER_SIZE)
-                        if len(data) == 0:
-                            # self.on_close()
-                            ## connections list has changed
-                            ## need to escape for loop to re-generate the new list of sockets
-                            # break
-                            pass
-                        else:
-                            self.received_data = data
-                            self.on_receive()                            
+                        data = self.socket_being_read.recv(config.BUFFER_SIZE)                        
+                        self.received_data = data
+                        self.on_receive()                            
                     except ConnectionResetError as e:
+                        print(e)
                         self.on_close()
-                        print(e)                        
+                                                
 
             
     def on_accept(self):
-        # accept
         socket, address = self.socket.accept()
-        # address = address[0]
         print('\n[{0} has connected]'.format(address))
         
         # register connection  
@@ -122,11 +114,16 @@ class Socket_server(threading.Thread,
         
         
     def on_close(self):
-        peer = self.socket_being_read.getpeername()
-        address = peer
-        print ('\n[{0} has disconnected]\n'.format(address))
+        closed_addresses = []
+        
+        for connection in self.connections.values():
+            if connection.get('socket') is self.socket_being_read:
+                closed_addresses.append(connection.get('address'))
                 
-        self.remove_connection(address)         
+        for address in closed_addresses:
+            self.remove_connection(address)
+            print ('\n[{0} has disconnected]\n'.format(address))        
+                
         self.print_connections()
                 
         

@@ -81,13 +81,9 @@ class Socket_client(commander.Commander):
             
             try: 
                 data = self.socket.recv(config.BUFFER_SIZE)
-                
-                # connection closed
-                if not data: 
+                if len(data) == 0:  # If Broker shut down, need this line to close socket
                     self.on_closed()
                     break
-                
-                # receive data
                 self.on_receive(data)
                 
             except Exception as e:

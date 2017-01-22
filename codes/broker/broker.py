@@ -32,6 +32,7 @@ def main():
     try:            
         broker = Broker()
         broker.run()
+        broker.hub.join()
         print('Broker stopped. _____________________________')        
         
     except KeyboardInterrupt:

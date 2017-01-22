@@ -16,6 +16,7 @@ IS_MICROPYTHON = SYS_IMPLEMENTATION == 'micropython'
 
 ## Must config ******************
 
+# BROKER_HOST = '192.168.0.105'
 BROKER_HOST = '192.168.0.105'
 BIND_IP = '0.0.0.0'   # the ip which broker listens to.
 HUB_PORT = 9662

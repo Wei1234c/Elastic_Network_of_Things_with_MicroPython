@@ -43,7 +43,7 @@ class Worker(socket_client.Socket_client):
                 
 
     def process_messages(self):
-        if config.IS_MICROPYTHON: print('[Memory - free: {} allocated: {}]'.format(gc.mem_free(), gc.mem_alloc()))
+        if config.IS_MICROPYTHON: print('[Memory - free: {}   allocated: {}]'.format(gc.mem_free(), gc.mem_alloc()))
         gc.collect()
         time_stamp = str(self.now())
         

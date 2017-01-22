@@ -75,28 +75,14 @@ class Commander():
         if result: message['result'] = result
         if reply_to: message['reply_to'] = reply_to        
         if correlation_id: message['correlation_id'] = correlation_id
-            
-        # message = {'sender': sender,
-                   # 'receiver': receiver,
-                   # 'type': type,
-                   # 'message_id': message_id,                    
-                   # 'info': info,                   
-                   # 'time_stamp': time_stamp,  
-                   # 'script': script,                   
-                   # 'to_compile': to_compile,
-                   # 'to_exec': to_exec,
-                   # 'to_evaluate': to_evaluate,
-                   # 'command': command,
-                   # 'function': function, 'kwargs': kwargs,
-                   # 'need_result': need_result, 'result': result,
-                   # 'reply_to': reply_to, 'correlation_id': correlation_id}
-                           
+                                   
         return message
 
         
     def get_OrderedDict(self, dictionary):
         return OrderedDict(sorted(dictionary.items())) 
 
+        
     def get_JSONized_dict(self, dictionary):
         return json.dumps(dictionary, sort_keys = True, indent = 4) 
                        
