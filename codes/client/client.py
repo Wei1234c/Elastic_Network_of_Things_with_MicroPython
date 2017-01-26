@@ -21,12 +21,12 @@ class Client(threading.Thread):
         
     def _request(self, node, receiver, message):
         message['receiver'] = receiver
-        self.node.request(**message)
+        return self.node.request(**message)
         
         
     def request(self, receiver, message):
         try:
-            self._request(self.node, receiver, message)  
+            return self._request(self.node, receiver, message)  
         except Exception as e:
             print(e)
         

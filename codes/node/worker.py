@@ -4,22 +4,23 @@
 import gc
 import config
 import socket_client
+import queue_manager
 import worker_config
 
 
-class Worker(socket_client.Socket_client): 
+class Worker(socket_client.Socket_client, queue_manager.Queue_manager): 
         
     # Object control
+    # @profile(precision=4)
     def __init__(self, server_address, server_port):
         super().__init__(server_address, server_port)
+        queue_manager.Queue_manager.__init__(self)
         self.name = worker_config.WORKER_NAME
         print('My name is', self.name)
-        self.message_queue_in = []
-        self.message_queue_out = []
-        # self.message_queue_result = []
         
          
-    # Socket operations    
+    # Socket operations 
+    # @profile(precision=4)
     def on_connected(self):
         # set my name
         message = self.format_message(sender = self.name,
@@ -31,29 +32,32 @@ class Worker(socket_client.Socket_client):
                                       need_result = True)
                                       
         print('\n[connected: {0}]'.format(self.server_address))
-        self.send_message(message)
+        self.request(message)              
         self.status['Is connected'] = True
         self.receive()
 
 
+    # @profile(precision=4)
     def on_receive(self, data):        
         super().on_receive(data)        
-        self.message_queue_in.append(self.message)        
+        self.append_received_message(self.message)
         self.process_messages()
-                
-
+        
+        
+    # @profile(precision=4)
     def process_messages(self):
-        if config.IS_MICROPYTHON: print('[Memory - free: {}   allocated: {}]'.format(gc.mem_free(), gc.mem_alloc()))
+        if config.IS_MICROPYTHON:
+            print('[Memory - free: {}   allocated: {}]'.format(gc.mem_free(), gc.mem_alloc()))
         gc.collect()
         time_stamp = str(self.now())
         
-        # outgoing messages requested by client
-        if len(self.message_queue_out) > 0:
-            self.send_message(message = self.message_queue_out.pop(0))        
+        # outgoing requested messages
+        message = self.pop_request_message()
+        if message: self.send_message(message = message)        
         
         # incoming messages
-        if len(self.message_queue_in) > 0:
-            message = self.message_queue_in.pop(0) 
+        message = self.pop_received_message()
+        if message: 
             
             # got result from somewhere else, no need to reply.
             if message.get('type') == 'result':
@@ -75,27 +79,27 @@ class Worker(socket_client.Socket_client):
                         
                         print('\nProcessed result:\n{0}\n'.format(self.get_OrderedDict(reply_message)))
                         
-                        if message.get('need_result'):                    
+                        if message.get('need_result'):      
                             self.send_message(reply_message)
                     
                 except Exception as e:
                     print(e, 'No result to return.')
 
         
+    # @profile(precision=4)
     def request(self, message):
-        if self.status['Is connected']:
-            time_stamp = str(self.now())
-            message['message_id'] = time_stamp
-            message['sender'] = self.name
-            message['reply_to'] = self.name          
-            message['result'] = None
-            message['correlation_id'] = time_stamp
-            self.message_queue_out.append(self.format_message(**message))        
-            if self.status['Datatransceiver ready']: self.process_messages()
-        else:
-            raise Exception('Not connected yet.')
+        time_stamp = str(self.now())
+        message['message_id'] = time_stamp
+        message['sender'] = self.name
+        message['reply_to'] = self.name          
+        message['result'] = None
+        message['correlation_id'] = time_stamp
+        asynch_result = self.append_request_message(self.format_message(**message))        
+        if self.status['Datatransceiver ready']: self.process_messages()
+        return message, asynch_result
         
 
+    # @profile(precision=4)
     def send_message(self, message):
         message_string = self.encode_message(**message)
         message_bytes = self.data_transceiver.pack(message_string)

@@ -9,37 +9,45 @@ import data_transceiver
 
 class Socket_client(commander.Commander):
     # Object control
+    # @profile(precision=4)
     def __init__(self, server_ip, server_port):
         super().__init__()
         self.socket = None
         self.data_transceiver = None
-        self.server_address = socket.getaddrinfo(server_ip, server_port)[-1][-1]
+        # self.server_address = socket.getaddrinfo(server_ip, server_port)[-1][-1]
+        self.server_address = (server_ip, server_port)
         self.status = {'Datatransceiver ready': False, 
                        'Is connected': False,
                        'Stop': False}
  
+    # @profile(precision=4)
     def __del__(self):
         self.parent = None
         
  
+    # @profile(precision=4)
     def set_parent(self, parent = None):        
         self.parent = parent
 
                   
+    # @profile(precision=4)
     def run(self):        
         self.connect()        
  
  
+    # @profile(precision=4)
     def stop(self):
         self.status['Stop'] = True
         
 
+    # @profile(precision=4)
     def stopped(self):
         return self.status['Stop']
         
         
     
     # Socket operations
+    # @profile(precision=4)
     def connect(self):        
         while True: 
             if self.stopped(): break             
@@ -59,17 +67,19 @@ class Socket_client(commander.Commander):
                 time.sleep(config.CLIENT_RETRY_TO_CONNECT_AFTER_SECONDS)
             
     
+    # @profile(precision=4)
     def on_connected(self):
         print('\n[connected: {0}]'.format(self.server_address))
         self.status['Is connected'] = True
         self.receive()
 
 
+    # @profile(precision=4)
     def on_closed(self):
         print('closed: ', self.server_address)
         del self.socket
             
-
+    # @profile(precision=4)
     def receive(self):
         print('[Listen to messages]')
         self.socket.settimeout(config.CLIENT_RECEIVE_TIME_OUT_SECONDS)
@@ -99,6 +109,7 @@ class Socket_client(commander.Commander):
                 self.process_messages()
  
 
+    # @profile(precision=4)
     def on_receive(self, data):
         if data:
             # data received

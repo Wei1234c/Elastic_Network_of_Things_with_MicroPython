@@ -5,29 +5,26 @@ import config
        
 class Data_transceiver():
         
+    # @profile(precision=4)
     def __init__(self):
         self.data = b''
         self.buffer = b''
         self.message = b''
-        self.header = config.PACKAGE_START
-        self.header_length = len(self.header)
-        self.tail = config.PACKAGE_END
-        self.tail_length = len(self.tail)
 
     
+    # @profile(precision=4)
     def pack(self, data):
         if data:
-            packed_bytes = b'' + self.header + data.encode() + self.tail
-            return packed_bytes
+            return b'' + config.PACKAGE_START + data.encode() + config.PACKAGE_END
         
         
     # http://dabeaz.blogspot.tw/2010/01/few-useful-bytearray-tricks.html        
+    # @profile(precision=4)
     def unpack(self, data):        
         if data:
             self.data = data
             self.buffer += self.data
-            start_at = self.buffer.find(self.header)
-            end_at = self.buffer.find(self.tail)
+            end_at = self.buffer.find(config.PACKAGE_END)
             
             if end_at > -1 :
                 return self.extract_message()
@@ -35,12 +32,10 @@ class Data_transceiver():
         return data, None
         
 
+    # @profile(precision=4)
     def extract_message(self):
-        start_at = self.buffer.find(self.header)
-        end_at = self.buffer.find(self.tail)
-        # print('Receiving data:')
-        # print('Buffer before extraction: {0} bytes\n{1}'.format(len(self.buffer), self.buffer))
-        self.message = self.buffer[start_at + self.header_length : end_at]
-        self.buffer = self.buffer[end_at + self.tail_length : ]
-        # print('Buffer after extraction: {0} bytes\n{1}\n'.format(len(self.buffer), self.buffer))
+        start_at = self.buffer.find(config.PACKAGE_START)
+        end_at = self.buffer.find(config.PACKAGE_END)
+        self.message = self.buffer[start_at + len(config.PACKAGE_START) : end_at]
+        self.buffer = self.buffer[end_at + len(config.PACKAGE_END) : ]
         return self.data, self.message.decode()

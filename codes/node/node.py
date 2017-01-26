@@ -18,23 +18,27 @@ else:
 
 class Node(commander.Commander):
 
+    # @profile(precision=4)
     def __init__(self):
         super().__init__()
         self.worker = worker_impl.Worker(config.BROKER_HOST, config.HUB_PORT)
         self.worker.set_parent(self)
         
-            
+        
+    # @profile(precision=4)
     def run(self): 
         self.worker.run()
  
- 
+    
+    # @profile(precision=4)
     def stop(self): 
         self.worker.stop()
         self.worker.set_parent(None)
         
         
+    # @profile(precision=4)
     def request(self, **message):
-        self.worker.request(message)
+        return self.worker.request(message)
         
         
 

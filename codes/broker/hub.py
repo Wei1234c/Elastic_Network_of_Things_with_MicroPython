@@ -3,6 +3,7 @@
 import config
 import socket_server
 import datetime
+import json
 now = datetime.datetime.now
 
 
@@ -40,7 +41,7 @@ class Hub(socket_server.Socket_server):
                                                             reply_to = config.SERVER_NAME,
                                                             correlation_id = message.get('correlation_id'))
                                                 
-                        print('\nProcessed result:\n{0}\n'.format(self.get_JSONized_dict(reply_message)))
+                        print('\nProcessed result:\n{0}\n'.format(json.dumps(reply_message, sort_keys = True, indent = 4)))
                         
                         # return result
                         if message.get('need_result'):                    
@@ -61,7 +62,7 @@ class Hub(socket_server.Socket_server):
                 socket = self.connections.get(str(address)).get('socket')
                 message_string = self.encode_message(**message)
                 message_bytes = self.data_transceivers[socket].pack(message_string)
-                print('\nMessage sent: {0} bytes\n{1}\n'.format(len(message_bytes), self.get_JSONized_dict(message)))                           
+                print('\nMessage sent: {0} bytes\n{1}\n'.format(len(message_bytes), json.dumps(message, sort_keys = True, indent = 4)))                           
                 socket.sendall(message_bytes) 
             except Exception as e:
                 print (e)

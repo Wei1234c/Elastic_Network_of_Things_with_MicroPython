@@ -1,11 +1,14 @@
 # coding: utf-8
 
+from memory_profiler import profile
+
 from abc import ABCMeta, abstractmethod
 import socket
 import select
 import threading
 import datetime
 import time
+import json
 import config 
 import connection_pool
 import commander
@@ -17,6 +20,7 @@ class Socket_server(threading.Thread,
                     metaclass = ABCMeta):
 
     # Object control
+    # @profile(precision=4)
     def __init__(self, bind_ip, bind_port, max_concurrent_connections = 200):        
         super().__init__()
         self.name = config.SERVER_NAME
@@ -26,37 +30,44 @@ class Socket_server(threading.Thread,
         self._stop.clear()
         
         # Socket
-        self.bind_address = socket.getaddrinfo(bind_ip, bind_port)[-1][-1]         
+        # self.bind_address = socket.getaddrinfo(bind_ip, bind_port)[-1][-1] 
+        self.bind_address = (bind_ip, bind_port)  
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)       
         self.socket.bind(self.bind_address)
         self.socket.listen(max_concurrent_connections)
 
         
+    # @profile(precision=4)
     def __del__(self):
         self.parent = None
         del self.parent
         
         
+    # @profile(precision=4)
     def set_parent(self, parent):        
         self.parent = parent
        
                   
+    # @profile(precision=4)
     def run(self):        
         self.listen()
  
 
+    # @profile(precision=4)
     def stop(self):
         print('Server set to stop __________________________')
         self._stop.set()
             
 
+    # @profile(precision=4)
     def stopped(self):
         return self._stop.is_set()
      
 
         
     # Socker server operations
+    # @profile(precision=4)
     def listen(self):
         
         threading.Thread(target = self.probe_connections , 
@@ -94,6 +105,7 @@ class Socket_server(threading.Thread,
                                                 
 
             
+    # @profile(precision=4)
     def on_accept(self):
         socket, address = self.socket.accept()
         print('\n[{0} has connected]'.format(address))
@@ -104,15 +116,17 @@ class Socket_server(threading.Thread,
         return connection
         
     
+    # @profile(precision=4)
     def on_receive(self):
         data = self.received_data
         data, message_string = self.data_transceivers[self.socket_being_read].unpack(data)
         message = self.decode_message(message_string) 
-        print('\nData received: {0} bytes\nMessage:\n{1}\n'.format(len(data), self.get_JSONized_dict(message)))
+        print('\nData received: {0} bytes\nMessage:\n{1}\n'.format(len(data), json.dumps(message, sort_keys = True, indent = 4)))
         
         self.process_message(message)
         
         
+    # @profile(precision=4)
     def on_close(self):
         closed_addresses = []
         
@@ -127,6 +141,7 @@ class Socket_server(threading.Thread,
         self.print_connections()
                 
         
+    # @profile(precision=4)
     def probe_connections(self):
         while True:
             if self.stopped(): break                

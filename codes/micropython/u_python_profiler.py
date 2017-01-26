@@ -1,4 +1,5 @@
 import gc
+import gc
 import micropython
 
 gc.collect()
@@ -37,6 +38,20 @@ def clean_memory():
 # print('Before free: {} allocated: {}'.format(free_before, loc_before))
 
 # status = {'Datatransceiver ready': False,'Is connected': False, 'Stop': False}
+# s = status.get('Datatransceiver ready')
+
+# gc.collect()
+# free_after, loc_after = gc.mem_free(), gc.mem_alloc()
+# print('After free: {} allocated: {}'.format(free_after, loc_after))
+# print('Diff: {}'.format(free_after - free_before, loc_after - loc_before))    
+
+# print('-----------------------------')
+# gc.collect()
+# free_before, loc_before = gc.mem_free(), gc.mem_alloc()
+# print('Before free: {} allocated: {}'.format(free_before, loc_before))
+
+# status = {'Datatransceiver ready': False,'Is connected': False, 'Stop': False}
+# s = status['Datatransceiver ready')
 
 # gc.collect()
 # free_after, loc_after = gc.mem_free(), gc.mem_alloc()

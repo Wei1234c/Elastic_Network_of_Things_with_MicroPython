@@ -12,8 +12,8 @@ else:
        
 class Commander():
 
+    # @profile(precision=4)
     def __init__(self):
-        # self.message_queue = 
         self.set_default_code_book()
         self.switch = {}
         self.switch['file'] = self.do_file
@@ -22,18 +22,20 @@ class Commander():
         self.switch['function'] = self.do_function
         self.switch['exec'] = self.do_exec
         self.switch['eval'] = self.do_eval
-        self.switch['compile'] = self.do_compile
 
 
+    # @profile(precision=4)
     def set_code_book(self, code_book = {}):        
         self.code_book = code_book
        
        
+    # @profile(precision=4)
     def set_default_code_book(self):
         self.code_book = {}
 
         
     # https://docs.python.org/3.5/library/json.html
+    # @profile(precision=4)
     def encode_message(self, **kwargs):
         try:
             return json.dumps(self.format_message(**kwargs))
@@ -41,6 +43,7 @@ class Commander():
             print(e)       
         
         
+    # @profile(precision=4)
     def format_message(self, 
                        sender, receiver, type,
                        message_id = None, 
@@ -48,7 +51,6 @@ class Commander():
                        time_stamp = None,
                        file = None,
                        script = None,
-                       to_compile = None,
                        to_exec = None,
                        to_evaluate = None,
                        command = None,
@@ -65,7 +67,6 @@ class Commander():
         if time_stamp: message['time_stamp'] = time_stamp
         if file: message['file'] = file
         if script: message['script'] = script
-        if to_compile: message['to_compile'] = to_compile
         if to_exec: message['to_exec'] = to_exec
         if to_evaluate: message['to_evaluate'] = to_evaluate
         if command: message['command'] = command
@@ -79,14 +80,12 @@ class Commander():
         return message
 
         
+    # @profile(precision=4)
     def get_OrderedDict(self, dictionary):
         return OrderedDict(sorted(dictionary.items())) 
-
-        
-    def get_JSONized_dict(self, dictionary):
-        return json.dumps(dictionary, sort_keys = True, indent = 4) 
                        
             
+    # @profile(precision=4)
     def decode_message(self, message_string):
         if message_string:
             try:
@@ -95,35 +94,37 @@ class Commander():
                 print(e)
                 
         
+    # @profile(precision=4)
     def do(self, message):
         if message: return self.switch[message.get('type')](message) 
 
         
+    # @profile(precision=4)
     def do_file(self, message):
         if message.get('file'):
+            # kwargs = message.get('kwargs')
+            # if kwargs:
+                # filename = kwargs.get('filename')
+            # filename = filename if filename else 'uploaded_file.py'
+            # with open(filename, 'w') as f:
             with open('uploaded_file.py', 'w') as f:
                 f.write(message.get('file'))
                 
         return None, None 
         
         
+    # @profile(precision=4)
     def do_script(self, message):
         if message.get('script'):
             with open('script.py', 'w') as f:
                 f.write(message.get('script'))
             import script
             script.main()
+            
         return None, None  
         
-
-    def do_compile(self, message):
-        if message.get('to_compile'):
-            task = compile
-            return self.do_task(task, message)   
-                
-        return None, None   
         
-        
+    # @profile(precision=4)
     def do_exec(self, message):
         if message.get('to_exec'):
             exec(message.get('to_exec'))
@@ -132,6 +133,7 @@ class Commander():
         return None, None   
 
         
+    # @profile(precision=4)
     def do_eval(self, message):
         if message.get('to_evaluate'):
             result = eval(message.get('to_evaluate'))
@@ -140,6 +142,7 @@ class Commander():
         return None, None 
         
         
+    # @profile(precision=4)
     def do_function(self, message):
         if message.get('function'):
             task = getattr(self, message.get('function'))
@@ -148,6 +151,7 @@ class Commander():
         return None, None             
         
 
+    # @profile(precision=4)
     def do_command(self, message):
         if message.get('command'):
             task = self.code_book.get(message.get('command'))            
@@ -156,6 +160,7 @@ class Commander():
         return None, None 
         
         
+    # @profile(precision=4)
     def do_task(self, task, message):
         if task:
             try:
@@ -168,6 +173,7 @@ class Commander():
         return None, None         
  
 
+    # @profile(precision=4)
     def process_result(self, message, result):
         if message.get('need_result'):
             message['type'] = 'result'
