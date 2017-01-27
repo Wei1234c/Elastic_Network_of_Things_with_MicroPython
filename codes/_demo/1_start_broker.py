@@ -17,6 +17,7 @@ def main():
     except KeyboardInterrupt:
         print("Ctrl C - Stopping.")
         the_broker.stop()
+        the_broker = None
         sys.exit(1)  
         
 if __name__ == '__main__':

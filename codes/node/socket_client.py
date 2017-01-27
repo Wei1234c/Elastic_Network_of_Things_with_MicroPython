@@ -14,8 +14,7 @@ class Socket_client(commander.Commander):
         super().__init__()
         self.socket = None
         self.data_transceiver = None
-        # self.server_address = socket.getaddrinfo(server_ip, server_port)[-1][-1]
-        self.server_address = (server_ip, server_port)
+        self.server_address = socket.getaddrinfo(server_ip, server_port)[-1][-1]        
         self.status = {'Datatransceiver ready': False, 
                        'Is connected': False,
                        'Stop': False}
@@ -38,6 +37,7 @@ class Socket_client(commander.Commander):
     # @profile(precision=4)
     def stop(self):
         self.status['Stop'] = True
+        self.socket.close()
         
 
     # @profile(precision=4)
@@ -76,7 +76,7 @@ class Socket_client(commander.Commander):
 
     # @profile(precision=4)
     def on_closed(self):
-        print('closed: ', self.server_address)
+        print('[closed: {}]'.format(self.server_address))
         del self.socket
             
     # @profile(precision=4)
@@ -112,7 +112,6 @@ class Socket_client(commander.Commander):
     # @profile(precision=4)
     def on_receive(self, data):
         if data:
-            # data received
             data, message_string = self.data_transceiver.unpack(data)
             self.message = self.decode_message(message_string)
             print('\nData received: {0} bytes\nMessage:\n{1}\n'.format(len(data), self.get_OrderedDict(self.message)))

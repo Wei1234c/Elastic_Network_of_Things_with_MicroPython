@@ -38,6 +38,7 @@ def main():
     except KeyboardInterrupt:
         print("Ctrl C - Stopping server")
         broker.stop()
+        broker = None
         sys.exit(1)
         
 

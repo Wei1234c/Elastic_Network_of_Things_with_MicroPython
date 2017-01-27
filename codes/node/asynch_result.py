@@ -18,24 +18,9 @@ class Asynch_result():
         self.request = None
         self._requests_need_result.pop(self.correlation_id)
         
-    # @profile(precision=4)    
-    # def get(self, timeout = config.ASYNCH_RESULT_TIMEOUT):        
-        ## stub = self.get_result_asynch(timeout)
-        ## result = next(stub)
-        # result = self.get_result(timeout)
-        # self.remove_request()
-        # return result         
-        
-            
-    # @profile(precision=4)
-    # def get_result_asynch(self, timeout = config.ASYNCH_RESULT_TIMEOUT):        
-        # result = yield self.get_result(timeout)
-        # yield result    # call back
-        
     
     # @profile(precision=4)
     def get(self, timeout = config.ASYNCH_RESULT_TIMEOUT):
-    # def get_result(self, timeout = config.ASYNCH_RESULT_TIMEOUT):
         start_time = time.time()
         
         if self.request:

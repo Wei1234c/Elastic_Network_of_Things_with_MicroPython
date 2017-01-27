@@ -50,6 +50,7 @@ def main():
     except KeyboardInterrupt:
         print("Ctrl C - Stopping.")
         node.stop()
+        node = None
         sys.exit(1)            
                 
         

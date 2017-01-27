@@ -51,9 +51,3 @@ class Queue_manager():
     # @profile(precision=4)
     def pop_received_message(self):
         return self._message_queue_in.pop(0) if len(self._message_queue_in) > 0 else None
-        
-        
-    # @profile(precision=4)
-    # def print_requests(self):
-        # print('\n[Requests need result]: {0} entries'.format(len(self._requests_need_result.items())))
-        # print('Requests:\n{0}\n'.format(self._requests_need_result))

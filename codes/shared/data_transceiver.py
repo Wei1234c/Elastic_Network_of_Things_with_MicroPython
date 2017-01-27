@@ -7,9 +7,7 @@ class Data_transceiver():
         
     # @profile(precision=4)
     def __init__(self):
-        self.data = b''
         self.buffer = b''
-        self.message = b''
 
     
     # @profile(precision=4)
@@ -22,20 +20,13 @@ class Data_transceiver():
     # @profile(precision=4)
     def unpack(self, data):        
         if data:
-            self.data = data
-            self.buffer += self.data
+            self.buffer += data
             end_at = self.buffer.find(config.PACKAGE_END)
             
             if end_at > -1 :
-                return self.extract_message()
+                start_at = self.buffer.find(config.PACKAGE_START)
+                message = self.buffer[start_at + len(config.PACKAGE_START) : end_at]
+                self.buffer = self.buffer[end_at + len(config.PACKAGE_END) : ]
+                return data, message.decode()
                 
         return data, None
-        
-
-    # @profile(precision=4)
-    def extract_message(self):
-        start_at = self.buffer.find(config.PACKAGE_START)
-        end_at = self.buffer.find(config.PACKAGE_END)
-        self.message = self.buffer[start_at + len(config.PACKAGE_START) : end_at]
-        self.buffer = self.buffer[end_at + len(config.PACKAGE_END) : ]
-        return self.data, self.message.decode()

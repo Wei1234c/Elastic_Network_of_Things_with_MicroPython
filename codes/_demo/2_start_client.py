@@ -11,6 +11,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.pardir, 'micropython')))
  
 import client
 from collections import OrderedDict
+
  
 # @profile(precision=4)
 def main():
@@ -20,21 +21,8 @@ def main():
         the_client = client.Client()
         the_client.start()
         
-        while not the_client.status['Is connected']:            
-            time.sleep(1)
-            print('Node not ready yet.')
         
-        
-        # nodes ************** need to modify accordingly.
-        # check out Broker's console for the list of nodes.
-        # remote_nodes = [{'name': 'Living room main light', 'type': 'D1 mini', 'id': 'NodeMCU_1dsc000'},
-                        # {'name': 'Coffee maker', 'type': 'NodeMCU v2', 'id': 'NodeMCU_f1d30800'},
-                        # {'name': 'Front gate', 'type': 'NodeMCU v2', 'id': 'NodeMCU_d1e0a200'},]                   
-
-        remote_nodes = [{'name': 'Coffee maker', 'type': 'NodeMCU v2', 'id': 'NodeMCU_f1d30800'},] 
-        # remote_nodes = [{'name': 'Coffee maker', 'type': 'NodeMCU v2', 'id': 'NodeMCU_1dsc000'},]         
-        
-        # messages
+        # messages _____________________________________________
         messages = OrderedDict()
 
         messages['read_GPIOs'] = {'type': 'command',
@@ -59,18 +47,38 @@ def main():
         # with open('script_to_deploy.py') as f:
             # script = f.read()        
         # messages['test upload script'] = {'type': 'script', 
-                                          # 'script': script}                                        
+                                          # 'script': script} 
+
+                                          
+        while not the_client.status['Is connected']:            
+            time.sleep(1)
+            print('Node not ready yet.')                                          
+                                          
+        # nodes _________________________________________________
+        # remote_nodes = [{'name': 'Living room main light', 'type': 'D1 mini', 'id': 'NodeMCU_1dsc000'},
+                        # {'name': 'Coffee maker', 'type': 'NodeMCU v2', 'id': 'NodeMCU_f1d30800'},
+                        # {'name': 'Front gate', 'type': 'NodeMCU v2', 'id': 'NodeMCU_d1e0a200'},] 
+
+        message = {'type': 'command',
+                   'command': 'list connections by name',
+                   'need_result': True}            
+            
+        _, asynch_result = the_client.request('Hub', message) 
+        remote_nodes = asynch_result.get().keys()
+        print('\n[____________ Connected nodes ____________]\n')        
+        print('\nConnected nodes:\n{}\n'.format(remote_nodes))                                          
         
         
-        print ('\n[______________ Sending messages ______________]\n')
+        print('\n[______________ Sending messages ______________]\n')
                 
         results = []
         
         ## send out the messages
         for message in messages.values():
             for remote_node in remote_nodes:
-                the_message, asynch_result = the_client.request(remote_node['id'], message) 
-                results.append((the_message, asynch_result))
+                if remote_node != the_client.node.worker.name:
+                    formatted_message, asynch_result = the_client.request(remote_node, message) 
+                    results.append((formatted_message, asynch_result))
 
         # collect and print results        
         print('\n[_________ Wait few seconds for reply _________]\n')
@@ -87,11 +95,13 @@ def main():
         
         # Stopping
         the_client.stop()
-        print ('\n[________________ Demo stopped ________________]\n')
+        the_client = None
+        print('\n[________________ Demo stopped ________________]\n')
         
     except KeyboardInterrupt:
         print("Ctrl C - Stopping.")
         the_client.stop()
+        the_client = None
         sys.exit(1) 
                 
         

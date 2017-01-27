@@ -2,7 +2,6 @@
 
 
 import datetime
-import config
 import worker
 
 
@@ -27,18 +26,14 @@ class Worker(worker.Worker):
     # Specialized functions__________
     # @profile(precision=4)
     def read_GPIOs(self): 
-        return read_GPIOs_pins() if config.IS_MICROPYTHON else "(Pin 16: 1, Pin 5: 0, Pin 13: 1, Pin 12: 1, Pin 14: 1, Pin 15: 0)"
+        return "(Pin 16: 1, Pin 5: 0, Pin 13: 1, Pin 12: 1, Pin 14: 1, Pin 15: 0)"
 
 
     # @profile(precision=4)
     def write_GPIOs(self, pins_and_values = None): 
-        return write_GPIOs_pins(pins_and_values) if config.IS_MICROPYTHON else "(Pin 16: 1, Pin 5: 0, Pin 13: 1, Pin 12: 1, Pin 14: 1, Pin 15: 0)"
+        return "(Pin 16: 1, Pin 5: 0, Pin 13: 1, Pin 12: 1, Pin 14: 1, Pin 15: 0)"
                         
     
     # @profile(precision=4)
     def blink_led(self, times = 1, forever = False, on_seconds = 0.5, off_seconds = 0.5):
-        if config.IS_MICROPYTHON:
-            blink_on_board_led(times = times, 
-                               forever = forever,
-                               on_seconds = on_seconds,
-                               off_seconds = off_seconds)
+        pass

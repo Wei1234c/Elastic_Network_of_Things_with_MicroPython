@@ -96,7 +96,12 @@ class Socket_server(threading.Thread,
                 else:
                     # try to receive data 
                     try: 
-                        data = self.socket_being_read.recv(config.BUFFER_SIZE)                        
+                        data = self.socket_being_read.recv(config.BUFFER_SIZE)
+                        # connections list has changed
+                        # need to escape for loop to re-generate the new list of sockets
+                        if len(data) == 0:
+                            self.on_close()
+                            break
                         self.received_data = data
                         self.on_receive()                            
                     except ConnectionResetError as e:

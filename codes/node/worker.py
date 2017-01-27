@@ -24,8 +24,7 @@ class Worker(socket_client.Socket_client, queue_manager.Queue_manager):
     def on_connected(self):
         # set my name
         message = self.format_message(sender = self.name,
-                                      receiver = config.SERVER_NAME,                                       
-                                      info = '*** Hello! My name is {0} ***'.format(self.name),
+                                      receiver = config.SERVER_NAME,
                                       type = 'command', 
                                       command = 'set connection name',
                                       kwargs = {'name': self.name}, 
