@@ -13,11 +13,8 @@ IS_MICROPYTHON = sys.implementation.name == 'micropython'
 # DEBUG_MODE = True
 
 
-
 # Shared ************************
-## Must config ******************
 HUB_PORT = 9662
-## Must config ******************
 SERVER_NAME = 'Hub'
 BUFFER_SIZE = 4096
 PACKAGE_START = b'---PACKAGE_START---'
@@ -26,9 +23,7 @@ PACKAGE_END = b'---PACKAGE_END---'
 
 
 # Hub ***************************
-## Must config ******************
 BIND_IP = '0.0.0.0'   # the ip which broker listens to.
-## Must config ******************
 MAX_CONCURRENT_CONNECTIONS = 200
 SERVER_POLLING_REQUEST_TIMEOUT_SECONDS = 60 
 HEART_BEAT_PROBING_PER_SECONDS = 60  

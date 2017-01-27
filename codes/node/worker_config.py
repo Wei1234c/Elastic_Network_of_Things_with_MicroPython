@@ -7,7 +7,7 @@ if config.IS_MICROPYTHON:
     import machine
     id = str(machine.unique_id())
     id = id.replace('\\', '_')    
-    for c in ['b\'', '_x', ' ', '_', '\'',]:
+    for c in ['b\'', '_x', ' ', '_', '\'', '(', ')', '#', '|']:
         id = id.replace(c, '')
     WORKER_NAME = 'NodeMCU_' + id
     

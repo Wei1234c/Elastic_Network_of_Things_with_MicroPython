@@ -31,7 +31,7 @@ class Worker(worker.Worker):
 
     # @profile(precision=4)
     def write_GPIOs(self, pins_and_values = None): 
-        return "(Pin 16: 1, Pin 5: 0, Pin 13: 1, Pin 12: 1, Pin 14: 1, Pin 15: 0)"
+        return self.read_GPIOs()
                         
     
     # @profile(precision=4)

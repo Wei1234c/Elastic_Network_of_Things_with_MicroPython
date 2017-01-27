@@ -128,7 +128,6 @@ class Commander():
     def do_exec(self, message):
         if message.get('to_exec'):
             exec(message.get('to_exec'))
-            return None, None   
                 
         return None, None   
 
