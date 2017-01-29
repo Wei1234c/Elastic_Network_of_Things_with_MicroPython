@@ -2,7 +2,6 @@
 
 import time
 import config
-import asynch_result
        
 
 class Queue_manager():
@@ -28,9 +27,8 @@ class Queue_manager():
         self._message_queue_out.append(message)
         if message.get('need_result'):  # need result, wait for reply.
             self.whether_requests_time_out()
-            self._requests_need_result[message.get('correlation_id')] = {'message_id': message.get('message_id')}            
-            return asynch_result.Asynch_result(message.get('correlation_id'), self._requests_need_result)
-
+            self._requests_need_result[message.get('correlation_id')] = {'message_id': message.get('message_id')}
+            
         
     # @profile(precision=4)
     def append_received_message(self, message):
@@ -40,7 +38,7 @@ class Queue_manager():
             request = self._requests_need_result.get(correlation_id)
             if request:                 
                 request['result'] = message.get('result')
-                request['is_replied'] = True
+                request['is_replied'] = True                
         
         
     # @profile(precision=4)

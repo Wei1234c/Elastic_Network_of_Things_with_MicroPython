@@ -63,8 +63,9 @@ def main():
                    'command': 'list connections by name',
                    'need_result': True}            
             
-        _, asynch_result = the_client.request('Hub', message) 
-        remote_nodes = asynch_result.get().keys()
+        _, asynch_result = the_client.request('Hub', message)
+        remote_nodes = sorted(list(asynch_result.get().keys()))
+        
         print('\n[____________ Connected nodes ____________]\n')        
         print('\nConnected nodes:\n{}\n'.format(remote_nodes))                                          
         

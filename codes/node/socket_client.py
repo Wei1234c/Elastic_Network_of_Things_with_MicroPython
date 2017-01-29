@@ -19,6 +19,7 @@ class Socket_client(commander.Commander):
                        'Is connected': False,
                        'Stop': False}
  
+
     # @profile(precision=4)
     def __del__(self):
         self.parent = None
@@ -79,35 +80,38 @@ class Socket_client(commander.Commander):
         print('[closed: {}]'.format(self.server_address))
         del self.socket
             
+    
     # @profile(precision=4)
     def receive(self):
         print('[Listen to messages]')
         self.socket.settimeout(config.CLIENT_RECEIVE_TIME_OUT_SECONDS)
         
         while True:
-            if self.stopped(): break 
-                
+            if self.stopped(): break                 
+            self.receive_one_cycle()
+
+    
+    # @profile(precision=4)
+    def receive_one_cycle(self):
+        try: 
             data = None
+            data = self.socket.recv(config.BUFFER_SIZE)
+            if len(data) == 0:  # If Broker shut down, need this line to close socket
+                self.on_closed()
+                # break
+            self.on_receive(data)
             
-            try: 
-                data = self.socket.recv(config.BUFFER_SIZE)
-                if len(data) == 0:  # If Broker shut down, need this line to close socket
-                    self.on_closed()
-                    break
-                self.on_receive(data)
-                
-            except Exception as e:
-                
-                # Connection reset.
-                if config.IS_MICROPYTHON:
-                    if str(e) == config.MICROPYTHON_SOCKET_CONNECTION_RESET_ERROR_MESSAGE:
-                        raise e
-                elif isinstance(e, ConnectionResetError):
+        except Exception as e:                
+            # Connection reset.
+            if config.IS_MICROPYTHON:
+                if str(e) == config.MICROPYTHON_SOCKET_CONNECTION_RESET_ERROR_MESSAGE:
                     raise e
-                    
-                # Receiving process timeout.
-                self.process_messages()
- 
+            elif isinstance(e, ConnectionResetError):
+                raise e
+                
+            # Receiving process timeout.
+            self.process_messages()
+        
 
     # @profile(precision=4)
     def on_receive(self, data):

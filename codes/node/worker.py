@@ -5,6 +5,7 @@ import gc
 import config
 import socket_client
 import queue_manager
+import asynch_result
 import worker_config
 
 
@@ -93,10 +94,14 @@ class Worker(socket_client.Socket_client, queue_manager.Queue_manager):
         message['reply_to'] = self.name          
         message['result'] = None
         message['correlation_id'] = time_stamp
-        asynch_result = self.append_request_message(self.format_message(**message))        
+        message = self.format_message(**message)
+        self.append_request_message(message) 
+        async_result = asynch_result.Asynch_result(message.get('correlation_id'),
+                                                   self._requests_need_result,
+                                                   self.receive_one_cycle)
         if self.status['Datatransceiver ready']: self.process_messages()
-        return message, asynch_result
-        
+        return message, async_result
+       
 
     # @profile(precision=4)
     def send_message(self, message):

@@ -12,4 +12,4 @@ if config.IS_MICROPYTHON:
     WORKER_NAME = 'NodeMCU_' + id
     
 else:
-    WORKER_NAME = 'client_366'
+    WORKER_NAME = 'Client_366'
