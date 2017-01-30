@@ -23,6 +23,23 @@ class Worker(socket_client.Socket_client, queue_manager.Queue_manager):
     # Socket operations 
     # @profile(precision=4)
     def on_connected(self):
+        print('\n[connected: {0}]'.format(self.server_address))
+        
+        # set my name
+        self.set_connection_name()
+        
+        self.status['Is connected'] = True
+        self.receive()
+        
+
+    # @profile(precision=4)
+    def rename(self, name):
+        self.name = name
+        self.set_connection_name()
+        
+        
+    # @profile(precision=4)
+    def set_connection_name(self):
         # set my name
         message = self.format_message(sender = self.name,
                                       receiver = config.SERVER_NAME,
@@ -30,12 +47,8 @@ class Worker(socket_client.Socket_client, queue_manager.Queue_manager):
                                       command = 'set connection name',
                                       kwargs = {'name': self.name}, 
                                       need_result = True)
-                                      
-        print('\n[connected: {0}]'.format(self.server_address))
-        self.request(message)              
-        self.status['Is connected'] = True
-        self.receive()
-
+        self.request(message)
+        
 
     # @profile(precision=4)
     def on_receive(self, data):        
@@ -95,10 +108,10 @@ class Worker(socket_client.Socket_client, queue_manager.Queue_manager):
         message['result'] = None
         message['correlation_id'] = time_stamp
         message = self.format_message(**message)
-        self.append_request_message(message) 
+        self.append_request_message(message)
         async_result = asynch_result.Asynch_result(message.get('correlation_id'),
                                                    self._requests_need_result,
-                                                   self.receive_one_cycle)
+                                                   self.receive_one_cycle) 
         if self.status['Datatransceiver ready']: self.process_messages()
         return message, async_result
        

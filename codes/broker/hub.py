@@ -60,9 +60,10 @@ class Hub(socket_server.Socket_server):
             
             try:
                 socket = self.connections.get(str(address)).get('socket')
-                message_string = self.encode_message(**message)
-                message_bytes = self.data_transceivers[socket].pack(message_string)
-                print('\nMessage sent: {0} bytes\n{1}\n'.format(len(message_bytes), json.dumps(message, sort_keys = True, indent = 4)))                           
-                socket.sendall(message_bytes) 
+                if socket:
+                    message_string = self.encode_message(**message)
+                    message_bytes = self.data_transceivers[socket].pack(message_string)
+                    print('\nMessage sent: {0} bytes\n{1}\n'.format(len(message_bytes), json.dumps(message, sort_keys = True, indent = 4)))                           
+                    socket.sendall(message_bytes) 
             except Exception as e:
                 print (e)

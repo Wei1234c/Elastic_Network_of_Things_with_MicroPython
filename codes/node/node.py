@@ -12,6 +12,7 @@ import commander
 
 if config.IS_MICROPYTHON:
     import worker_upython as worker_impl
+    # import worker_neuron as worker_impl    
 else:
     import worker_cpython as worker_impl   
     

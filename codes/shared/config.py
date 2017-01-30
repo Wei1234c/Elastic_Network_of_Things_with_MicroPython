@@ -32,7 +32,7 @@ HEART_BEAT_PROBING_PER_SECONDS = 60
 
 # Client ************************
 ## Must config ******************
-BROKER_HOST = '192.168.0.105'
+BROKER_HOST = '192.168.0.100'
 ## Must config ******************
 CLIENT_RETRY_TO_CONNECT_AFTER_SECONDS = 3
 CLIENT_RECEIVE_TIME_OUT_SECONDS = 1

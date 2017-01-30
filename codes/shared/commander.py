@@ -76,7 +76,7 @@ class Commander():
         if result: message['result'] = result
         if reply_to: message['reply_to'] = reply_to        
         if correlation_id: message['correlation_id'] = correlation_id
-                                   
+        
         return message
 
         
@@ -102,12 +102,11 @@ class Commander():
     # @profile(precision=4)
     def do_file(self, message):
         if message.get('file'):
-            # kwargs = message.get('kwargs')
-            # if kwargs:
-                # filename = kwargs.get('filename')
-            # filename = filename if filename else 'uploaded_file.py'
-            # with open(filename, 'w') as f:
-            with open('uploaded_file.py', 'w') as f:
+            kwargs = message.get('kwargs')
+            if kwargs:
+                filename = kwargs.get('filename')
+            filename = filename if filename else 'uploaded_file.py'
+            with open(filename, 'w') as f:
                 f.write(message.get('file'))
                 
         return None, None 

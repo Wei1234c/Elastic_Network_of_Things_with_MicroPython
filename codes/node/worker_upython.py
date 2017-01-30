@@ -25,6 +25,11 @@ class Worker(worker.Worker):
         self.set_code_book(code_book)        
         
         
+    # @profile(precision=4)
+    def rename(self, name):
+        self.name = name
+        
+        
     # Specialized functions__________
     # @profile(precision=4)
     def read_GPIOs(self): 
