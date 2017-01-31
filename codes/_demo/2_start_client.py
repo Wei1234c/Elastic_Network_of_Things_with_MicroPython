@@ -24,16 +24,16 @@ def main():
         
         # messages _____________________________________________
         messages = OrderedDict()
-                          
-        messages['blink_led'] = {'type': 'command',
-                                 'command': 'blink led',
-                                 'kwargs': {'times': 10, 'forever': False, 'on_seconds': 0.1, 'off_seconds': 0.1}}
 
         messages['read_GPIOs'] = {'type': 'command',
                                   'command': 'read GPIOs',
                                   'kwargs': {'pins': [5, 12, 13, 14, 15, 16]},
                                   'need_result': True}
-                                  
+
+        messages['blink_led'] = {'type': 'command',
+                                 'command': 'blink led',
+                                 'kwargs': {'times': 10, 'forever': False, 'on_seconds': 0.1, 'off_seconds': 0.1}}
+
         # messages['write_GPIOs'] = {'type': 'command',
                                    # 'command': 'write GPIOs',
                                    # 'kwargs': {'pins_and_values': [(2, 0), (2, 1), (2, 0),]}} 
@@ -53,7 +53,7 @@ def main():
                                           
         while not the_client.status['Is connected']:            
             time.sleep(1)
-            print('Node not ready yet.')                                          
+            print('Node not ready yet.')
                                           
         # nodes _________________________________________________
         message = {'type': 'command',
@@ -61,6 +61,7 @@ def main():
                    'need_result': True}            
         _, asynch_result = the_client.request('Hub', message)
         remote_nodes = sorted(list(asynch_result.get().keys()))
+
 
         print('\n[____________ Connected nodes ____________]\n')        
         print('\nConnected nodes:\n{}\n'.format(remote_nodes))                                          
@@ -74,7 +75,8 @@ def main():
         for message in messages.values():
             for remote_node in remote_nodes:
                 if remote_node != the_client.node.worker.name:
-                    formatted_message, asynch_result = the_client.request(remote_node, message) 
+                    time.sleep(0.1) # PyCharm needs this delay.
+                    formatted_message, asynch_result = the_client.request(remote_node, message)
                     results.append((formatted_message, asynch_result))
 
         # collect and print results        

@@ -25,14 +25,14 @@ class Worker(worker.Worker):
         
     # Specialized functions__________
     def read_GPIOs(self, pins): 
-        pass
+        return 'Not applicable.'
         
 
     # @profile(precision=4)
-    def write_GPIOs(self, pins_and_values): 
-        pass
+    def write_GPIOs(self, pins_and_values):
+        return 'Not applicable.'
         
     
     # @profile(precision=4)
     def blink_led(self, times = 1, forever = False, on_seconds = 0.5, off_seconds = 0.5):
-        pass
+        return 'Not applicable.'
