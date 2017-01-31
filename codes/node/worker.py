@@ -23,7 +23,7 @@ class Worker(socket_client.Socket_client, queue_manager.Queue_manager):
     # Socket operations 
     # @profile(precision=4)
     def on_connected(self):
-        print('\n[connected: {0}]'.format(self.server_address))
+        print('\n[Connected: {0}]'.format(self.server_address))
         
         # set my name
         self.set_connection_name()

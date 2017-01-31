@@ -19,17 +19,17 @@ class Asynch_result():
         request = self._requests_need_result.get(self.correlation_id)
         
         if request:
-            while True:                
-                if request.get('is_replied'): 
+            while True:
+                if request.get('is_replied'):
                     result = request.get('result')
-                    self._requests_need_result.pop(self.correlation_id)
+                    # self._requests_need_result.pop(self.correlation_id)
                     return result
-                else:                  
+                else:
                     if time.time() - start_time > timeout:  # timeout
-                        message_id = request.get('message_id')
-                        self._requests_need_result.pop(self.correlation_id)
-                        raise Exception('Timeout: no result returned for request with message_id {}'.format(message_id))
+                        # self._requests_need_result.pop(self.correlation_id)
+                        raise Exception('Timeout: no result returned for request with correlation_id {}'.format(self.correlation_id))
                     else:
-                        self.yield_to()
+                        pass
+                        # self.yield_to()
         else:
             raise Exception('No such request for request with correlation_id {}'.format(self.correlation_id)) 

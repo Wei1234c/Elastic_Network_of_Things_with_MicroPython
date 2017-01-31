@@ -18,7 +18,7 @@ class Queue_manager():
     def whether_requests_time_out(self):
         now = time.time()
         if now - self.lastest_request_time > config.REQUESTS_NEED_RESULT_TIME_TO_LIVE:
-            self._requests_need_result = {}                
+            self._requests_need_result = {}
         self.lastest_request_time = now
         
         
@@ -27,7 +27,7 @@ class Queue_manager():
         self._message_queue_out.append(message)
         if message.get('need_result'):  # need result, wait for reply.
             self.whether_requests_time_out()
-            self._requests_need_result[message.get('correlation_id')] = {'message_id': message.get('message_id')}
+            self._requests_need_result[message.get('correlation_id')] = {'correlation_id': message.get('correlation_id')}
             
         
     # @profile(precision=4)
@@ -36,9 +36,9 @@ class Queue_manager():
         if message.get('type') == 'result':
             correlation_id = message.get('correlation_id')
             request = self._requests_need_result.get(correlation_id)
-            if request:                 
+            if request:
                 request['result'] = message.get('result')
-                request['is_replied'] = True                
+                request['is_replied'] = True              
         
         
     # @profile(precision=4)

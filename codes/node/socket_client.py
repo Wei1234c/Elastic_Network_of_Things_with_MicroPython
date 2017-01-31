@@ -70,14 +70,14 @@ class Socket_client(commander.Commander):
     
     # @profile(precision=4)
     def on_connected(self):
-        print('\n[connected: {0}]'.format(self.server_address))
+        print('\n[Connected: {0}]'.format(self.server_address))
         self.status['Is connected'] = True
         self.receive()
 
 
     # @profile(precision=4)
     def on_closed(self):
-        print('[closed: {}]'.format(self.server_address))
+        print('[Closed: {}]'.format(self.server_address))
         del self.socket
             
     

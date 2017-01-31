@@ -1,5 +1,5 @@
-print('_______ testing remote deploy ______')
-print('_______ deployed from remote _______')
+print('_______ Testing remote deploy ______')
+print('_______ Deployed from remote _______')
 
 import machine
 import time

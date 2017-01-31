@@ -13,15 +13,10 @@ def get_output_pin(id, mode = machine.Pin.OUT, pull = None):
 def get_input_pin(id, mode = machine.Pin.IN):
     return machine.Pin(id, mode)
 
-    
+
 # @profile(precision=4)
-def read_GPIOs_pin(id):
-    return id, get_input_pin(id).value() 
-    
-        
-# @profile(precision=4)
-def read_GPIOs_pins():
-    status = sorted([(id, get_input_pin(id).value()) for id in list(hardware.gpio_pins[5:])])
+def read_GPIOs_pins(pins):
+    status = sorted([(id, get_input_pin(id).value()) for id in pins])
     return status
 
     

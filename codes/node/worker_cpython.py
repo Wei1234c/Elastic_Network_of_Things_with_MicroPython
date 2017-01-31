@@ -24,15 +24,14 @@ class Worker(worker.Worker):
         
         
     # Specialized functions__________
-    # @profile(precision=4)
-    def read_GPIOs(self): 
-        return "(Pin 16: 1, Pin 5: 0, Pin 13: 1, Pin 12: 1, Pin 14: 1, Pin 15: 0)"
+    def read_GPIOs(self, pins): 
+        pass
+        
 
-
     # @profile(precision=4)
-    def write_GPIOs(self, pins_and_values = None): 
-        return self.read_GPIOs()
-                        
+    def write_GPIOs(self, pins_and_values): 
+        pass
+        
     
     # @profile(precision=4)
     def blink_led(self, times = 1, forever = False, on_seconds = 0.5, off_seconds = 0.5):

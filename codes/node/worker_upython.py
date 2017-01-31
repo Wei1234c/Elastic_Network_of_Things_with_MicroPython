@@ -31,13 +31,12 @@ class Worker(worker.Worker):
         
         
     # Specialized functions__________
-    # @profile(precision=4)
-    def read_GPIOs(self): 
-        return u_python.read_GPIOs_pins()
+    def read_GPIOs(self, pins): 
+        return u_python.read_GPIOs_pins(pins)
         
 
     # @profile(precision=4)
-    def write_GPIOs(self, pins_and_values = None): 
+    def write_GPIOs(self, pins_and_values): 
         return u_python.write_GPIOs_pins(pins_and_values)
         
     
