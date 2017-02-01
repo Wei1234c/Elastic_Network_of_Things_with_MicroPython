@@ -1,25 +1,26 @@
 # coding: utf-8
 
 import time
+# noinspection PyUnresolvedReferences
 import config
        
 
-class Queue_manager():
+class Queue_manager:
     
     # @profile(precision=4)
     def __init__(self):
         self._message_queue_in = []
         self._message_queue_out = []
         self._requests_need_result = {}
-        self.lastest_request_time = 0
+        self.latest_request_time = 0
 
         
     # @profile(precision=4)
     def whether_requests_time_out(self):
         now = time.time()
-        if now - self.lastest_request_time > config.REQUESTS_NEED_RESULT_TIME_TO_LIVE:
+        if now - self.latest_request_time > config.REQUESTS_NEED_RESULT_TIME_TO_LIVE:
             self._requests_need_result = {}
-        self.lastest_request_time = now
+        self.latest_request_time = now
         
         
     # @profile(precision=4)
@@ -27,13 +28,14 @@ class Queue_manager():
         self._message_queue_out.append(message)
         if message.get('need_result'):  # need result, wait for reply.
             self.whether_requests_time_out()
-            self._requests_need_result[message.get('correlation_id')] = {'correlation_id': message.get('correlation_id')}
+            correlation_id = message.get('correlation_id')
+            self._requests_need_result[correlation_id] = {'correlation_id': correlation_id}
             
         
     # @profile(precision=4)
     def append_received_message(self, message):
         self._message_queue_in.append(message)
-        if message.get('type') == 'result':
+        if message.get('message_type') == 'result':
             correlation_id = message.get('correlation_id')
             request = self._requests_need_result.get(correlation_id)
             if request:

@@ -1,12 +1,14 @@
 # coding: utf-8
 
 import time
+# noinspection PyUnresolvedReferences
 import machine
+# noinspection PyUnresolvedReferences
 import hardware
 
 
 on_board_led = machine.Pin(hardware.ON_BOARD_LED_PIN_NO, machine.Pin.OUT)
-on_board_led.value(0 if hardware.ON_BOARD_LED_HIGH_IS_ON else 1) # LED off
+on_board_led.value(0 if hardware.ON_BOARD_LED_HIGH_IS_ON else 1)  # LED off
 
 
 def blink_on_board_led(times = 1, forever = False, on_seconds = 0.5, off_seconds = 0.5):

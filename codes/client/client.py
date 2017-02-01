@@ -2,12 +2,12 @@
 
 import os
 import sys
-import time
 import threading
  
 sys.path.append(os.path.abspath(os.path.join(os.path.pardir, 'shared')))
 sys.path.append(os.path.abspath(os.path.join(os.path.pardir, 'node')))
 
+# noinspection PyPep8,PyUnresolvedReferences
 import node
 
 
@@ -19,14 +19,14 @@ class Client(threading.Thread):
         self.status = self.node.worker.status
         
         
-    def _request(self, node, receiver, message):
+    def _request(self, receiver, message):
         message['receiver'] = receiver
         return self.node.request(**message)
         
         
     def request(self, receiver, message):
         try:
-            return self._request(self.node, receiver, message)  
+            return self._request(receiver, message)
         except Exception as e:
             print(e)
         

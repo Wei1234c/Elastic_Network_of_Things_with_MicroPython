@@ -2,10 +2,15 @@
 
 
 import gc
+# noinspection PyUnresolvedReferences
 import config
+# noinspection PyUnresolvedReferences
 import socket_client
+# noinspection PyUnresolvedReferences
 import queue_manager
+# noinspection PyUnresolvedReferences
 import asynch_result
+# noinspection PyUnresolvedReferences
 import worker_config
 
 
@@ -43,7 +48,7 @@ class Worker(socket_client.Socket_client, queue_manager.Queue_manager):
         # set my name
         message = self.format_message(sender = self.name,
                                       receiver = config.SERVER_NAME,
-                                      type = 'command', 
+                                      message_type = 'command', 
                                       command = 'set connection name',
                                       kwargs = {'name': self.name}, 
                                       need_result = True)
@@ -73,7 +78,7 @@ class Worker(socket_client.Socket_client, queue_manager.Queue_manager):
         if message: 
             
             # got result from somewhere else, no need to reply.
-            if message.get('type') == 'result':
+            if message.get('message_type') == 'result':
                 pass
                 
             else:
@@ -85,7 +90,7 @@ class Worker(socket_client.Socket_client, queue_manager.Queue_manager):
                         reply_message = self.format_message(message_id = time_stamp,
                                                             sender = self.name,
                                                             receiver = message.get('sender'),
-                                                            type = 'result',
+                                                            message_type = 'result',
                                                             need_result = False, result = message.get('result'),
                                                             reply_to = self.name,
                                                             correlation_id = message.get('correlation_id'))

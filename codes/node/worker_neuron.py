@@ -1,7 +1,4 @@
-import os
-# import datetime
-import time
-import json
+
 
 INITIAL_WEIGHT = 0
 ACTION_POTENTIAL = 1
@@ -9,10 +6,12 @@ RESTING_POTENTIAL = 0
 POLARIZATION_SECONDS = 0.5
 REFRACTORY_PERIOD = 0.1
 
+# noinspection PyPep8,PyUnresolvedReferences
 import worker_upython
 
 
-class Worker(worker_upython.Worker): 
+# noinspection PyAttributeOutsideInit,PyPep8,PyPep8Naming
+class Worker(worker_upython.Worker):
     
     def __init__(self, server_address, server_port):
         super().__init__(server_address, server_port)
@@ -20,9 +19,10 @@ class Worker(worker_upython.Worker):
 
 
     def initializeConfig(self):
-        self.config = {}
-        self.config['inputs'] = {}
-        self.config['output'] = {'value': RESTING_POTENTIAL, 'polarized_time': self.now(), 'lasting': REFRACTORY_PERIOD * 1000}
+        self.config = {'inputs': {},
+                       'output': {'value': RESTING_POTENTIAL,
+                                  'polarized_time': self.now(),
+                                  'lasting': REFRACTORY_PERIOD * 1000}}
         self.emptyLog()
 
         
@@ -85,7 +85,8 @@ class Worker(worker_upython.Worker):
 
        
     def getThreshold(self, ):
-        return self.config.get('threshold', float("inf"))    
+        # noinspection PyTypeChecker
+        return self.config.get('threshold', float("inf"))
         
 
     def in_refractory_period(self, ):
@@ -97,16 +98,16 @@ class Worker(worker_upython.Worker):
         
     def sumInputsAndWeights(self, ):
         weights = self.config.get('weights', {})
-        inputs = self.config.get('inputs', {})
+        signal_inputs = self.config.get('inputs', {})
         sum_of_weighted_inputs = 0
         currentTime = self.now()
         
         # sum weighted inputs
-        for neuron in inputs:
-            input = inputs[neuron]        
+        for neuron in signal_inputs:
+            signal_input = signal_inputs[neuron]
             # if input signal doesn't expire yet
-            input['value'] = input.get('value', ACTION_POTENTIAL) if input['kick_time'] + input['lasting'] >= currentTime else RESTING_POTENTIAL        
-            sum_of_weighted_inputs += input['value'] * weights.get(neuron, INITIAL_WEIGHT)
+            signal_input['value'] = signal_input.get('value', ACTION_POTENTIAL) if signal_input['kick_time'] + signal_input['lasting'] >= currentTime else RESTING_POTENTIAL
+            sum_of_weighted_inputs += signal_input['value'] * weights.get(neuron, INITIAL_WEIGHT)
                     
         return sum_of_weighted_inputs
 
@@ -132,24 +133,23 @@ class Worker(worker_upython.Worker):
 
     def receiveInput(self, neuron_id): 
         # recording input
-        inputs = self.config.get('inputs', {})  
-        input = inputs.get(neuron_id)
+        signal_inputs = self.config.get('inputs', {})
+        signal_input = signal_inputs.get(neuron_id)
         
         # the time input was received
         currentTime = self.now()
         
         # no record yet, need to initialize
-        if input is None:
-            input = {}
-            input['value'] = RESTING_POTENTIAL
-            input['kick_time'] = currentTime
-            input['lasting'] = POLARIZATION_SECONDS * 1000
-            inputs[neuron_id] = input
+        if signal_input is None:
+            signal_input = {'value': RESTING_POTENTIAL,
+                     'kick_time': currentTime,
+                     'lasting': POLARIZATION_SECONDS * 1000}
+            signal_inputs[neuron_id] = signal_input
         
-        remainingValue = input['value'] if input['kick_time'] + input['lasting'] >= currentTime else RESTING_POTENTIAL  # 上一次 input 的殘餘值
-        input['value'] = remainingValue + ACTION_POTENTIAL  # cumulate
-        input['kick_time'] = currentTime
-        input['lasting'] = POLARIZATION_SECONDS * 1000
+        remainingValue = signal_input['value'] if signal_input['kick_time'] + signal_input['lasting'] >= currentTime else RESTING_POTENTIAL  # 上一次 input 的殘餘值
+        signal_input['value'] = remainingValue + ACTION_POTENTIAL  # cumulate
+        signal_input['kick_time'] = currentTime
+        signal_input['lasting'] = POLARIZATION_SECONDS * 1000
         
 
     def kick(self, neuron_id):
@@ -194,7 +194,7 @@ class Worker(worker_upython.Worker):
         for connection in connections.keys():            
             # send message to kick other neurons
             message = {'receiver': connection,
-                       'type': 'function',
+                       'message_type': 'function',
                        'function': 'kick',
                        'kwargs': {'neuron_id': self.name}}
             self.request(message)

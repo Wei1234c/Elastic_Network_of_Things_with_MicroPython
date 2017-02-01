@@ -1,15 +1,17 @@
 # coding: utf-8
 
+# noinspection PyUnresolvedReferences
 import config
 
 
-if config.IS_MICROPYTHON:    
+if config.IS_MICROPYTHON:
+    # noinspection PyUnresolvedReferences
     import machine
-    id = str(machine.unique_id())
-    id = id.replace('\\', '_')    
+    unique_id = str(machine.unique_id())
+    unique_id = unique_id.replace('\\', '_')    
     for c in ['b\'', '_x', ' ', '_', '\'', '(', ')', '#', '|']:
-        id = id.replace(c, '')
-    WORKER_NAME = 'NodeMCU_' + id
+        unique_id = unique_id.replace(c, '')
+    WORKER_NAME = 'NodeMCU_' + unique_id
     
 else:
     WORKER_NAME = 'Client_366'

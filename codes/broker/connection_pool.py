@@ -2,10 +2,12 @@
 
 
 import json
+# noinspection PyUnresolvedReferences
 import data_transceiver
 
 
-class Connection_pool():
+# noinspection PyUnresolvedReferences,PyDefaultArgument
+class Connection_pool:
 
     def __init__(self):
         self.connections = {}
@@ -64,7 +66,7 @@ class Connection_pool():
        
 
     def get_connection(self, address = None, name = None):
-        return (self.connections.get(str(address)) if address else self.get_connection_by_name(name))
+        return self.connections.get(str(address)) if address else self.get_connection_by_name(name)
         
         
     def regenerate_connections_by_name(self):
@@ -78,6 +80,7 @@ class Connection_pool():
 
         
     def print_connections(self):
+        # noinspection PyTypeChecker
         print('Connections count: {0}'.format(len(self.connections_by_name.items())))
         connections = dict(self.connections_by_name.items())
         connections_list = json.dumps(connections, sort_keys = True, indent = 4)

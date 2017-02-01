@@ -1,10 +1,12 @@
 # coding: utf-8
 
 import time
+# noinspection PyUnresolvedReferences
 import config
 
 
-class Asynch_result(): 
+# noinspection PyPep8
+class Asynch_result:
         
     # @profile(precision=4)
     def __init__(self, correlation_id, requests, yield_to):
@@ -15,17 +17,20 @@ class Asynch_result():
         
     # @profile(precision=4)    
     def get(self, timeout = config.ASYNCH_RESULT_TIMEOUT):
+        # time.sleep(config.ASYNCH_RESULT_WAIT_BEFORE_GET)
         start_time = time.time()
         request = self._requests_need_result.get(self.correlation_id)
         
         if request:
             while True:
+                current_time = time.time()
+
                 if request.get('is_replied'):
                     result = request.get('result')
                     # self._requests_need_result.pop(self.correlation_id)
                     return result
                 else:
-                    if time.time() - start_time > timeout:  # timeout
+                    if current_time - start_time > timeout:  # timeout
                         # self._requests_need_result.pop(self.correlation_id)
                         raise Exception('Timeout: no result returned for request with correlation_id {}'.format(self.correlation_id))
                     else:

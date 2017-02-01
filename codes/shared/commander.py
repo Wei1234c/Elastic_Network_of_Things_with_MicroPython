@@ -1,52 +1,55 @@
 # coding: utf-8
 
 import json
+# noinspection PyUnresolvedReferences
 import config
 
 
 if config.IS_MICROPYTHON:
+    # noinspection PyUnresolvedReferences,PyUnresolvedReferences
     from ucollections import OrderedDict
 else:
     from collections import OrderedDict
-       
-       
-class Commander():
+
+
+# noinspection PyMethodMayBeStatic,PyDefaultArgument,PyPep8Naming
+class Commander:
 
     # @profile(precision=4)
     def __init__(self):
+        self.code_book = None
         self.set_default_code_book()
-        self.switch = {}
-        self.switch['file'] = self.do_file
-        self.switch['script'] = self.do_script
-        self.switch['command'] = self.do_command
-        self.switch['function'] = self.do_function
-        self.switch['exec'] = self.do_exec
-        self.switch['eval'] = self.do_eval
+        self.switch = {'file': self.do_file,
+                       'script': self.do_script,
+                       'command': self.do_command,
+                       'function': self.do_function,
+                       'exec': self.do_exec,
+                       'eval': self.do_eval}
 
 
     # @profile(precision=4)
-    def set_code_book(self, code_book = {}):        
+    def set_code_book(self, code_book = {}):
         self.code_book = code_book
-       
-       
+
+
     # @profile(precision=4)
     def set_default_code_book(self):
         self.code_book = {}
 
-        
+
     # https://docs.python.org/3.5/library/json.html
     # @profile(precision=4)
     def encode_message(self, **kwargs):
         try:
             return json.dumps(self.format_message(**kwargs))
         except Exception as e:
-            print(e)       
-        
-        
+            print(e)
+
+
     # @profile(precision=4)
-    def format_message(self, 
-                       sender, receiver, type,
-                       message_id = None, 
+    def format_message(self,
+                       sender, receiver, message_type,
+                       message_id = None,
                        info = None,
                        time_stamp = None,
                        file = None,
@@ -57,11 +60,11 @@ class Commander():
                        function = None, kwargs = None,
                        need_result = False, result = None,
                        reply_to = None, correlation_id = None):
-        
-        message = {}        
+
+        message = {}
         if sender: message['sender'] = sender
         if receiver: message['receiver'] = receiver
-        if type: message['type'] = type
+        if message_type: message['message_type'] = message_type
         if message_id: message['message_id'] = message_id
         if info: message['info'] = info
         if time_stamp: message['time_stamp'] = time_stamp
@@ -74,17 +77,17 @@ class Commander():
         if kwargs: message['kwargs'] = kwargs
         if need_result: message['need_result'] = need_result
         if result: message['result'] = result
-        if reply_to: message['reply_to'] = reply_to        
+        if reply_to: message['reply_to'] = reply_to
         if correlation_id: message['correlation_id'] = correlation_id
-        
+
         return message
 
-        
+
     # @profile(precision=4)
     def get_OrderedDict(self, dictionary):
-        return OrderedDict(sorted(dictionary.items())) 
-                       
-            
+        return OrderedDict(sorted(dictionary.items()))
+
+
     # @profile(precision=4)
     def decode_message(self, message_string):
         if message_string:
@@ -92,15 +95,16 @@ class Commander():
                 return json.loads(message_string)
             except Exception as e:
                 print(e)
-                
-        
+
+
     # @profile(precision=4)
     def do(self, message):
-        if message: return self.switch[message.get('type')](message) 
+        if message: return self.switch[message.get('message_type')](message)
 
-        
+
     # @profile(precision=4)
     def do_file(self, message):
+        filename = None
         if message.get('file'):
             kwargs = message.get('kwargs')
             if kwargs:
@@ -108,56 +112,57 @@ class Commander():
             filename = filename if filename else 'uploaded_file.py'
             with open(filename, 'w') as f:
                 f.write(message.get('file'))
-                
-        return None, None 
-        
-        
+
+        return None, None
+
+
     # @profile(precision=4)
     def do_script(self, message):
         if message.get('script'):
             with open('script.py', 'w') as f:
                 f.write(message.get('script'))
+            # noinspection PyUnresolvedReferences
             import script
             script.main()
-            
-        return None, None  
-        
-        
+
+        return None, None
+
+
     # @profile(precision=4)
     def do_exec(self, message):
         if message.get('to_exec'):
             exec(message.get('to_exec'))
-                
-        return None, None   
 
-        
+        return None, None
+
+
     # @profile(precision=4)
     def do_eval(self, message):
         if message.get('to_evaluate'):
             result = eval(message.get('to_evaluate'))
-            return self.process_result(message, result)   
-                
-        return None, None 
-        
-        
+            return self.process_result(message, result)
+
+        return None, None
+
+
     # @profile(precision=4)
     def do_function(self, message):
         if message.get('function'):
             task = getattr(self, message.get('function'))
             return self.do_task(task, message)
-            
-        return None, None             
-        
+
+        return None, None
+
 
     # @profile(precision=4)
     def do_command(self, message):
         if message.get('command'):
-            task = self.code_book.get(message.get('command'))            
-            return self.do_task(task, message)    
-            
-        return None, None 
-        
-        
+            task = self.code_book.get(message.get('command'))
+            return self.do_task(task, message)
+
+        return None, None
+
+
     # @profile(precision=4)
     def do_task(self, task, message):
         if task:
@@ -166,16 +171,16 @@ class Commander():
                 result = task(**kwargs) if kwargs else task()
                 return self.process_result(message, result)
             except Exception as e:
-                print(e)   
-                
-        return None, None         
- 
+                print(e)
+
+        return None, None
+
 
     # @profile(precision=4)
     def process_result(self, message, result):
         if message.get('need_result'):
-            message['type'] = 'result'
+            message['message_type'] = 'result'
             message['result'] = result
             return message, self.encode_message(**message)
-        
-        return None, None 
+
+        return None, None

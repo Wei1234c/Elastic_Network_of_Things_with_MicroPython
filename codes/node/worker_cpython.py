@@ -2,10 +2,12 @@
 
 
 import datetime
+# noinspection PyUnresolvedReferences
 import worker
 
 
-class Worker(worker.Worker): 
+# noinspection PyMethodMayBeStatic,PyPep8Naming,PyUnusedLocal
+class Worker(worker.Worker):
         
     # Object control
     # @profile(precision=4)

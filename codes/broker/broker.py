@@ -5,11 +5,13 @@ import sys
 
 sys.path.append(os.path.abspath(os.path.join(os.path.pardir, 'shared')))
 
+# noinspection PyPep8,PyUnresolvedReferences
 import config
+# noinspection PyPep8,PyUnresolvedReferences
 import hub
 
 
-class Broker():
+class Broker:
 
     def __init__(self):
         super().__init__()
@@ -37,7 +39,9 @@ def main():
         
     except KeyboardInterrupt:
         print("Ctrl C - Stopping server")
+        # noinspection PyUnboundLocalVariable
         broker.stop()
+        # noinspection PyUnusedLocal
         broker = None
         sys.exit(1)
         

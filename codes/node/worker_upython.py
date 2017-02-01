@@ -2,12 +2,16 @@
 
 
 import time
-import worker 
+# noinspection PyUnresolvedReferences
+import worker
+# noinspection PyUnresolvedReferences
 import led
-import u_python  
+# noinspection PyUnresolvedReferences
+import u_python
 
 
-class Worker(worker.Worker): 
+# noinspection PyMethodMayBeStatic,PyAttributeOutsideInit,PyPep8Naming
+class Worker(worker.Worker):
         
     # Object control
     # @profile(precision=4)
@@ -31,7 +35,7 @@ class Worker(worker.Worker):
         
         
     # Specialized functions__________
-    def read_GPIOs(self, pins): 
+    def read_GPIOs(self, pins):
         return u_python.read_GPIOs_pins(pins)
         
 

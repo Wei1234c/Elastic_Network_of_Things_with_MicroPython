@@ -2,17 +2,23 @@
 
 import time
 import socket
+# noinspection PyUnresolvedReferences
 import commander
+# noinspection PyUnresolvedReferences
 import config
+# noinspection PyUnresolvedReferences
 import data_transceiver
-    
 
+
+# noinspection PyPep8
 class Socket_client(commander.Commander):
     # Object control
     # @profile(precision=4)
     def __init__(self, server_ip, server_port):
         super().__init__()
+        self.parent = None
         self.socket = None
+        self.message = None
         self.data_transceiver = None
         self.server_address = socket.getaddrinfo(server_ip, server_port)[-1][-1]        
         self.status = {'Datatransceiver ready': False, 
@@ -94,6 +100,7 @@ class Socket_client(commander.Commander):
     # @profile(precision=4)
     def receive_one_cycle(self):
         try: 
+            # noinspection PyUnusedLocal
             data = None
             data = self.socket.recv(config.BUFFER_SIZE)
             if len(data) == 0:  # If Broker shut down, need this line to close socket
@@ -108,7 +115,7 @@ class Socket_client(commander.Commander):
                     raise e
             elif isinstance(e, ConnectionResetError):
                 raise e
-                
+
             # Receiving process timeout.
             self.process_messages()
         
@@ -119,4 +126,3 @@ class Socket_client(commander.Commander):
             data, message_string = self.data_transceiver.unpack(data)
             self.message = self.decode_message(message_string)
             print('\nData received: {0} bytes\nMessage:\n{1}\n'.format(len(data), self.get_OrderedDict(self.message)))
-            

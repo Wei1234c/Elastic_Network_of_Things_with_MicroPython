@@ -1,6 +1,8 @@
 # coding: utf-8
 
+# noinspection PyUnresolvedReferences
 import config
+# noinspection PyUnresolvedReferences
 import socket_server
 import datetime
 import json
@@ -23,7 +25,7 @@ class Hub(socket_server.Socket_server):
             message['time_stamp'] = time_stamp
             
             if message.get('receiver') == config.SERVER_NAME:    # message is dedicated to Hub
-                if message.get('type') == 'result': # result replied to Hub
+                if message.get('message_type') == 'result':  # result replied to Hub
                     pass
                 
                 else:   # new request to Hub 
@@ -36,12 +38,13 @@ class Hub(socket_server.Socket_server):
                                                             sender = config.SERVER_NAME,
                                                             receiver = message.get('sender'),
                                                             time_stamp = time_stamp,
-                                                            type = 'result',
+                                                            message_type = 'result',
                                                             need_result = False, result = message.get('result'),
                                                             reply_to = config.SERVER_NAME,
                                                             correlation_id = message.get('correlation_id'))
                                                 
-                        print('\nProcessed result:\n{0}\n'.format(json.dumps(reply_message, sort_keys = True, indent = 4)))
+                        print('\nProcessed result:\n{0}\n'.format(json.dumps(reply_message,
+                                                                             sort_keys = True, indent = 4)))
                         
                         # return result
                         if message.get('need_result'):                    
@@ -63,7 +66,9 @@ class Hub(socket_server.Socket_server):
                 if socket:
                     message_string = self.encode_message(**message)
                     message_bytes = self.data_transceivers[socket].pack(message_string)
-                    print('\nMessage sent: {0} bytes\n{1}\n'.format(len(message_bytes), json.dumps(message, sort_keys = True, indent = 4)))                           
+                    print('\nMessage sent: {0} bytes\n{1}\n'.format(len(message_bytes), json.dumps(message,
+                                                                                                   sort_keys = True,
+                                                                                                   indent = 4)))
                     socket.sendall(message_bytes) 
             except Exception as e:
-                print (e)
+                print(e)

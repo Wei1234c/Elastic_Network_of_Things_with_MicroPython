@@ -1,7 +1,6 @@
 # coding: utf-8
 
-from memory_profiler import profile
-
+# noinspection PyUnresolvedReferences
 from abc import ABCMeta, abstractmethod
 import socket
 import select
@@ -9,8 +8,11 @@ import threading
 import datetime
 import time
 import json
-import config 
+# noinspection PyUnresolvedReferences
+import config
+# noinspection PyUnresolvedReferences
 import connection_pool
+# noinspection PyUnresolvedReferences
 import commander
 
 
@@ -24,6 +26,9 @@ class Socket_server(threading.Thread,
     def __init__(self, bind_ip, bind_port, max_concurrent_connections = 200):        
         super().__init__()
         self.name = config.SERVER_NAME
+        self.parent = None
+        self.socket_being_read = None
+        self.received_data = None
         connection_pool.Connection_pool.__init__(self)
         commander.Commander.__init__(self)
         self._stop = threading.Event()
@@ -66,11 +71,11 @@ class Socket_server(threading.Thread,
      
 
         
-    # Socker server operations
+    # Socket server operations
     # @profile(precision=4)
     def listen(self):
         
-        threading.Thread(target = self.probe_connections , 
+        threading.Thread(target = self.probe_connections,
                          name = 'Workers heart-beat probing',
                          daemon = True).start()   
         
@@ -112,11 +117,11 @@ class Socket_server(threading.Thread,
             
     # @profile(precision=4)
     def on_accept(self):
-        socket, address = self.socket.accept()
+        the_socket, address = self.socket.accept()
         print('\n[{0} has connected]'.format(address))
         
         # register connection  
-        connection = self.register_connection(address, socket)
+        connection = self.register_connection(address, the_socket)
         self.print_connections()
         return connection
         
@@ -126,7 +131,8 @@ class Socket_server(threading.Thread,
         data = self.received_data
         data, message_string = self.data_transceivers[self.socket_being_read].unpack(data)
         message = self.decode_message(message_string) 
-        print('\nData received: {0} bytes\nMessage:\n{1}\n'.format(len(data), json.dumps(message, sort_keys = True, indent = 4)))
+        print('\nData received: {0} bytes\nMessage:\n{1}\n'.format(len(data), json.dumps(message,
+                                                                                         sort_keys = True, indent = 4)))
         
         self.process_message(message)
         
@@ -141,7 +147,7 @@ class Socket_server(threading.Thread,
                 
         for address in closed_addresses:
             self.remove_connection(address)
-            print ('\n[{0} has disconnected]\n'.format(address))        
+            print('\n[{0} has disconnected]\n'.format(address))
                 
         self.print_connections()
                 
@@ -154,13 +160,13 @@ class Socket_server(threading.Thread,
             
             message = {'sender': self.name,
                        'receiver': 'all workers',
-                       'type': 'info',
+                       'message_type': 'info',
                        'info': 'Just check to see if you are still there. No reply needed.', 
                        'need_result': False}            
             
-            for socket in self.get_sockets_list():
+            for the_socket in self.get_sockets_list():
                 message_string = self.encode_message(**message)
-                message_bytes = self.data_transceivers[socket].pack(message_string)
-                socket.sendall(message_bytes)
+                message_bytes = self.data_transceivers[the_socket].pack(message_string)
+                the_socket.sendall(message_bytes)
             
             time.sleep(config.HEART_BEAT_PROBING_PER_SECONDS)
