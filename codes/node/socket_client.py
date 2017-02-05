@@ -41,7 +41,7 @@ class Message_client():
     # @profile(precision=4)
     def stop(self):
         self.status['Stop'] = True
-        self.socket.close()
+        self.close()
         
 
     # @profile(precision=4)
@@ -77,9 +77,15 @@ class Message_client():
         self.status['Is connected'] = True
         self.receive()
 
+        
+    # @profile(precision=4)
+    def close(self):
+        self.socket.close()
+        self.on_close()
+        
 
     # @profile(precision=4)
-    def on_closed(self):
+    def on_close(self):
         print('[Closed: {}]'.format(self.server_address))
         del self.socket
             
@@ -97,7 +103,7 @@ class Message_client():
                 data = None
                 data = self.socket.recv(config.BUFFER_SIZE)
                 if len(data) == 0:  # If Broker shut down, need this line to close socket
-                    self.on_closed()
+                    self.on_close()
                     break
                 self.on_receive(data)
                 
@@ -120,7 +126,7 @@ class Message_client():
             data = None
             data = self.socket.recv(config.BUFFER_SIZE)
             if len(data) == 0:  # If Broker shut down, need this line to close socket
-                self.on_closed()
+                self.on_close()
             self.on_receive(data)
             
         except Exception as e:                
