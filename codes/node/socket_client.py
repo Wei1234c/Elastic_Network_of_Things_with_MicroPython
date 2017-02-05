@@ -3,19 +3,16 @@
 import time
 import socket
 # noinspection PyUnresolvedReferences
-import commander
-# noinspection PyUnresolvedReferences
 import config
 # noinspection PyUnresolvedReferences
 import data_transceiver
 
 
 # noinspection PyPep8
-class Socket_client(commander.Commander):
+class Socket_client():
     # Object control
     # @profile(precision=4)
     def __init__(self, server_ip, server_port):
-        super().__init__()
         self.parent = None
         self.socket = None
         self.message = None
@@ -134,5 +131,12 @@ class Socket_client(commander.Commander):
     def on_receive(self, data):
         if data:
             data, message_string = self.data_transceiver.unpack(data)
-            self.message = self.decode_message(message_string)
-            print('\nData received: {0} bytes\nMessage:\n{1}\n'.format(len(data), self.get_OrderedDict(self.message)))
+            self.message = message_string
+            print('\nData received: {0} bytes'.format(len(data)))
+  
+
+    # @profile(precision=4)
+    def send_message(self, message_string):        
+        message_bytes = self.data_transceiver.pack(message_string)
+        print('\nSending {} bytes'.format(len(message_bytes)))        
+        self.socket.sendall(message_bytes)            

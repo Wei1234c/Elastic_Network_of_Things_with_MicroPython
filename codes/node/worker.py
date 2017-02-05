@@ -7,6 +7,8 @@ import config
 # noinspection PyUnresolvedReferences
 import socket_client
 # noinspection PyUnresolvedReferences
+import commander
+# noinspection PyUnresolvedReferences
 import queue_manager
 # noinspection PyUnresolvedReferences
 import asynch_result
@@ -14,13 +16,14 @@ import asynch_result
 import worker_config
 
 
-class Worker(socket_client.Socket_client, queue_manager.Queue_manager): 
+class Worker(socket_client.Socket_client, queue_manager.Queue_manager, commander.Commander): 
         
     # Object control
     # @profile(precision=4)
     def __init__(self, server_address, server_port):
         super().__init__(server_address, server_port)
-        queue_manager.Queue_manager.__init__(self)
+        queue_manager.Queue_manager.__init__(self)        
+        commander.Commander.__init__(self)
         self.name = worker_config.WORKER_NAME
         print('My name is', self.name)
         
@@ -57,7 +60,9 @@ class Worker(socket_client.Socket_client, queue_manager.Queue_manager):
 
     # @profile(precision=4)
     def on_receive(self, data):        
-        super().on_receive(data)        
+        super().on_receive(data)
+        self.message = self.decode_message(self.message)
+        print('Message:\n{}\n'.format(self.get_OrderedDict(self.message)))
         self.append_received_message(self.message)
         self.process_messages()
         
@@ -127,6 +132,6 @@ class Worker(socket_client.Socket_client, queue_manager.Queue_manager):
     # @profile(precision=4)
     def send_message(self, message):
         message_string = self.encode_message(**message)
-        message_bytes = self.data_transceiver.pack(message_string)
-        print('Sending {0} bytes\nMessage:\n{1}\n'.format(len(message_bytes), self.get_OrderedDict(message)))
-        self.socket.sendall(message_bytes)
+        super().send_message(message_string)        
+        print('Message:\n{}\n'.format(self.get_OrderedDict(message)))
+        
