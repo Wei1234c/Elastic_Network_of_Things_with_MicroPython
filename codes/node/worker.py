@@ -5,7 +5,7 @@ import gc
 # noinspection PyUnresolvedReferences
 import config
 # noinspection PyUnresolvedReferences
-import socket_client
+import socket_client as message_client
 # noinspection PyUnresolvedReferences
 import commander
 # noinspection PyUnresolvedReferences
@@ -16,7 +16,7 @@ import asynch_result
 import worker_config
 
 
-class Worker(socket_client.Socket_client, queue_manager.Queue_manager, commander.Commander): 
+class Worker(message_client.Message_client, queue_manager.Queue_manager, commander.Commander): 
         
     # Object control
     # @profile(precision=4)

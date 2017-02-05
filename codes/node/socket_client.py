@@ -9,7 +9,7 @@ import data_transceiver
 
 
 # noinspection PyPep8
-class Socket_client():
+class Message_client():
     # Object control
     # @profile(precision=4)
     def __init__(self, server_ip, server_port):
