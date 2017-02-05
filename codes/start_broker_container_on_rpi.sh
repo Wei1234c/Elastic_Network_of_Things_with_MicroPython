@@ -1,1 +1,1 @@
-docker run -it -p 9662:9662 --name=Broker --hostname=Broker --volume=/data/elastic_network_of_things_with_micropython:/project wei1234c/python_armv7 /bin/sh -c "cd /project/codes/broker && python3 broker.py" 
+docker run -it --rm -p 9662:9662 --name=Broker --hostname=Broker --volume=/data/elastic_network_of_things_with_micropython:/project wei1234c/python_armv7 /bin/sh -c "cd /project/codes/broker && python3 broker.py"

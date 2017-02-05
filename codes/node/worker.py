@@ -114,12 +114,13 @@ class Worker(socket_client.Socket_client, queue_manager.Queue_manager):
         message['correlation_id'] = time_stamp
         message = self.format_message(**message)
         self.append_request_message(message)
+        if self.status['Datatransceiver ready']: self.process_messages()
+            
         async_result = None
         if message.get('need_result'):
             async_result = asynch_result.Asynch_result(message.get('correlation_id'),
                                                        self._requests_need_result,
-                                                       self.receive_one_cycle)
-        if self.status['Datatransceiver ready']: self.process_messages()
+                                                       self.receive_one_cycle)        
         return message, async_result
        
 

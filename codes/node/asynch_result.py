@@ -34,7 +34,6 @@ class Asynch_result:
                         # self._requests_need_result.pop(self.correlation_id)
                         raise Exception('Timeout: no result returned for request with correlation_id {}'.format(self.correlation_id))
                     else:
-                        pass
-                        # self.yield_to()
+                        self.yield_to()
         else:
             raise Exception('No such request for request with correlation_id {}'.format(self.correlation_id)) 

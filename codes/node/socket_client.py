@@ -93,8 +93,27 @@ class Socket_client(commander.Commander):
         self.socket.settimeout(config.CLIENT_RECEIVE_TIME_OUT_SECONDS)
         
         while True:
-            if self.stopped(): break                 
-            self.receive_one_cycle()
+            if self.stopped(): break    
+                
+            try: 
+                # noinspection PyUnusedLocal
+                data = None
+                data = self.socket.recv(config.BUFFER_SIZE)
+                if len(data) == 0:  # If Broker shut down, need this line to close socket
+                    self.on_closed()
+                    break
+                self.on_receive(data)
+                
+            except Exception as e:                
+                # Connection reset.
+                if config.IS_MICROPYTHON:
+                    if str(e) == config.MICROPYTHON_SOCKET_CONNECTION_RESET_ERROR_MESSAGE:
+                        raise e
+                elif isinstance(e, ConnectionResetError):
+                    raise e
+
+                # Receiving process timeout.
+                self.process_messages()
 
     
     # @profile(precision=4)
@@ -105,19 +124,10 @@ class Socket_client(commander.Commander):
             data = self.socket.recv(config.BUFFER_SIZE)
             if len(data) == 0:  # If Broker shut down, need this line to close socket
                 self.on_closed()
-                # break
             self.on_receive(data)
             
         except Exception as e:                
-            # Connection reset.
-            if config.IS_MICROPYTHON:
-                if str(e) == config.MICROPYTHON_SOCKET_CONNECTION_RESET_ERROR_MESSAGE:
-                    raise e
-            elif isinstance(e, ConnectionResetError):
-                raise e
-
-            # Receiving process timeout.
-            self.process_messages()
+            pass
         
 
     # @profile(precision=4)
