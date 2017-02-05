@@ -5,50 +5,21 @@ import socket
 # noinspection PyUnresolvedReferences
 import config
 # noinspection PyUnresolvedReferences
+import message_client
+# noinspection PyUnresolvedReferences
 import data_transceiver
 
 
 # noinspection PyPep8
-class Message_client():
+class Message_client(message_client.Message_client):
     # Object control
     # @profile(precision=4)
     def __init__(self, server_ip, server_port):
-        self.parent = None
+        super().__init__(server_ip, server_port)
+        self.server_address = socket.getaddrinfo(server_ip, server_port)[-1][-1]     
         self.socket = None
-        self.message = None
-        self.data_transceiver = None
-        self.server_address = socket.getaddrinfo(server_ip, server_port)[-1][-1]        
-        self.status = {'Datatransceiver ready': False, 
-                       'Is connected': False,
-                       'Stop': False}
- 
-
-    # @profile(precision=4)
-    def __del__(self):
-        self.parent = None
-        
- 
-    # @profile(precision=4)
-    def set_parent(self, parent = None):        
-        self.parent = parent
-
-                  
-    # @profile(precision=4)
-    def run(self):        
-        self.connect()        
- 
- 
-    # @profile(precision=4)
-    def stop(self):
-        self.status['Stop'] = True
-        self.socket.close()
-        
-
-    # @profile(precision=4)
-    def stopped(self):
-        return self.status['Stop']
-        
-        
+        self.data_transceiver = None   
+    
     
     # Socket operations
     # @profile(precision=4)
@@ -64,29 +35,29 @@ class Message_client():
                 self.message = None
                 self.status['Is connected'] = False
                 self.socket.connect(self.server_address)
-                self.on_connected()  
+                self.on_connect()  
                 
             except Exception as e:
                 print(e)
                 time.sleep(config.CLIENT_RETRY_TO_CONNECT_AFTER_SECONDS)
-            
-    
+      
+        
     # @profile(precision=4)
-    def on_connected(self):
-        print('\n[Connected: {0}]'.format(self.server_address))
-        self.status['Is connected'] = True
-        self.receive()
-
+    def close(self):
+        self.socket.close()
+        super().close()
+        
 
     # @profile(precision=4)
     def on_closed(self):
-        print('[Closed: {}]'.format(self.server_address))
+        super().on_closed()
         del self.socket
             
     
     # @profile(precision=4)
     def receive(self):
-        print('[Listen to messages]')
+        super().receive()
+        
         self.socket.settimeout(config.CLIENT_RECEIVE_TIME_OUT_SECONDS)
         
         while True:
@@ -129,14 +100,14 @@ class Message_client():
 
     # @profile(precision=4)
     def on_receive(self, data):
+        super().on_receive(data)
         if data:
             data, message_string = self.data_transceiver.unpack(data)
             self.message = message_string
-            print('\nData received: {0} bytes'.format(len(data)))
-  
+            
 
     # @profile(precision=4)
-    def send_message(self, message_string):        
-        message_bytes = self.data_transceiver.pack(message_string)
-        print('\nSending {} bytes'.format(len(message_bytes)))        
+    def send_message(self, message_string):  
+        super().send_message(message_string)
+        message_bytes = self.data_transceiver.pack(message_string)   
         self.socket.sendall(message_bytes)            

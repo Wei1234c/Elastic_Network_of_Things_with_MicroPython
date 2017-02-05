@@ -30,7 +30,7 @@ class Worker(message_client.Message_client, queue_manager.Queue_manager, command
          
     # Socket operations 
     # @profile(precision=4)
-    def on_connected(self):
+    def on_connect(self):
         print('\n[Connected: {0}]'.format(self.server_address))
         
         # set my name
